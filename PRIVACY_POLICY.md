@@ -9,27 +9,13 @@ Full Bloom Software ("we", "our", or "us") operates the AirCalc mobile applicati
 
 AirCalc is designed with your privacy in mind. We do not collect, store, or share any personally identifiable information.
 
-### Analytics Data
-
-We use Firebase Analytics and Google Analytics to understand how users interact with our App. These services may collect anonymous usage data including:
-
-- Device information (model, operating system version)
-- App usage statistics (features used, session duration)
-- Crash reports and performance data
-- General location (country/region level only, derived from IP address)
-
-This data is collected anonymously and cannot be used to identify individual users. It helps us improve the App's functionality and user experience.
-
 ### Data Storage
 
 Any data you create within AirCalc (such as calculations or saved values) is stored locally on your device only. We do not have access to this data, and it is not transmitted to our servers or any third parties.
 
 ## Third-Party Services
 
-We use the following third-party services that may collect information:
-
-- **Firebase Analytics** - [Privacy Policy](https://firebase.google.com/support/privacy)
-- **Google Analytics** - [Privacy Policy](https://policies.google.com/privacy)
+AirCalc does not integrate with any third-party services, analytics platforms, or advertising networks.
 
 ## Permissions
 
