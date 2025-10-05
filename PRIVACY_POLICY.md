@@ -1,35 +1,64 @@
 # Privacy Policy for AirCalc
 
 **Effective Date:** October 5, 2025
+**Last Updated:** October 5, 2025
 
-## Overview
-AirCalc ("we", "our", or "the app") is committed to protecting your privacy. This privacy policy explains how AirCalc handles user information.
+Full Bloom Software ("we", "our", or "us") operates the AirCalc mobile application (the "App"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our App.
 
-## Data Collection
-AirCalc does **NOT** collect, store, transmit, or share any personal data or user information. The app operates entirely offline on your device.
+## Information Collection and Use
 
-## Permissions
-AirCalc does not require any special Android permissions beyond basic app functionality.
+AirCalc is designed with your privacy in mind. We do not collect, store, or share any personally identifiable information.
 
-## Data Storage
-All app calculations and settings are stored locally on your device only. No data is transmitted to external servers or third parties.
+### Analytics Data
+
+We use Firebase Analytics and Google Analytics to understand how users interact with our App. These services may collect anonymous usage data including:
+
+- Device information (model, operating system version)
+- App usage statistics (features used, session duration)
+- Crash reports and performance data
+- General location (country/region level only, derived from IP address)
+
+This data is collected anonymously and cannot be used to identify individual users. It helps us improve the App's functionality and user experience.
+
+### Data Storage
+
+Any data you create within AirCalc (such as calculations or saved values) is stored locally on your device only. We do not have access to this data, and it is not transmitted to our servers or any third parties.
 
 ## Third-Party Services
-AirCalc does not integrate with any third-party services, analytics platforms, or advertising networks.
+
+We use the following third-party services that may collect information:
+
+- **Firebase Analytics** - [Privacy Policy](https://firebase.google.com/support/privacy)
+- **Google Analytics** - [Privacy Policy](https://policies.google.com/privacy)
+
+## Permissions
+
+AirCalc does not require or request any special permissions to access device features such as camera, location, contacts, or storage.
 
 ## Children's Privacy
-AirCalc does not knowingly collect any information from children under 13. Since the app collects no data at all, it is safe for users of all ages.
 
-## Changes to This Policy
-We may update this privacy policy from time to time. Any changes will be posted within the app and on our distribution platforms.
+Our App does not knowingly collect any information from children under the age of 13. The App is suitable for all ages.
 
-## Contact
-If you have questions about this privacy policy, please contact us at:
-- Email: mattlelonek@gmail.com
+## Data Security
 
-## Data Deletion
-Since AirCalc does not collect or store any user data externally, there is no data to delete. All local app data can be removed by uninstalling the app from your device.
+Since we do not collect personal data, there is no personal data to secure on our servers. Any local data stored on your device is protected by your device's built-in security features.
+
+## Changes to This Privacy Policy
+
+We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.
+
+## Your Rights (GDPR Compliance)
+
+As we do not collect personal data, there is no personal data for you to access, modify, or delete from our systems. You can delete all local app data by uninstalling the App from your device.
+
+## Contact Us
+
+If you have any questions about this Privacy Policy, please contact us:
+
+**Full Bloom Software**
+Email: mattlelonek@gmail.com
+Location: United Kingdom
 
 ---
 
-**Summary:** AirCalc is a privacy-focused calculator and unit converter that operates completely offline. No personal information is collected, stored, or shared.
+*By using AirCalc, you agree to the collection and use of information in accordance with this policy.*
