@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Air fryer pot body in green -->
+    <path
+        android:fillColor="#014B38"
+        android:pathData="M65,85h70v15c0,8.284 -6.716,15 -15,15h-40c-8.284,0 -15,-6.716 -15,-15z" />
+
+    <!-- Steam line 1 in red -->
+    <path
+        android:fillColor="#A31B1B"
+        android:pathData="M85,80c0,1.5 0.75,3 1.5,4.5c0.75,1.5 1.5,2.25 1.5,3.75c0,1.5 -0.75,3 -1.5,4.5c-0.75,1.5 -1.5,2.25 -1.5,3.75h3c0,-1.5 0.75,-3 1.5,-4.5c0.75,-1.5 1.5,-2.25 1.5,-3.75c0,-1.5 -0.75,-3 -1.5,-4.5c-0.75,-1.5 -1.5,-2.25 -1.5,-3.75z" />
+
+    <!-- Steam line 2 in red -->
+    <path
+        android:fillColor="#A31B1B"
+        android:pathData="M100,80c0,1.5 0.75,3 1.5,4.5c0.75,1.5 1.5,2.25 1.5,3.75c0,1.5 -0.75,3 -1.5,4.5c-0.75,1.5 -1.5,2.25 -1.5,3.75h3c0,-1.5 0.75,-3 1.5,-4.5c0.75,-1.5 1.5,-2.25 1.5,-3.75c0,-1.5 -0.75,-3 -1.5,-4.5c-0.75,-1.5 -1.5,-2.25 -1.5,-3.75z" />
+
+    <!-- Steam line 3 in red -->
+    <path
+        android:fillColor="#A31B1B"
+        android:pathData="M115,80c0,1.5 0.75,3 1.5,4.5c0.75,1.5 1.5,2.25 1.5,3.75c0,1.5 -0.75,3 -1.5,4.5c-0.75,1.5 -1.5,2.25 -1.5,3.75h3c0,-1.5 0.75,-3 1.5,-4.5c0.75,-1.5 1.5,-2.25 1.5,-3.75c0,-1.5 -0.75,-3 -1.5,-4.5c-0.75,-1.5 -1.5,-2.25 -1.5,-3.75z" />
+
+    <!-- "AirCalc" text simplified for circular display -->
+    <path
+        android:fillColor="#014B38"
+        android:pathData="M50,130 L55,115 L60,130 L57,130 L55.5,125 L53.5,130 Z" />
+    <path
+        android:fillColor="#014B38"
+        android:pathData="M63,115 L65,115 L65,130 L63,130 Z" />
+    <path
+        android:fillColor="#014B38"
+        android:pathData="M68,115 L70,115 L70,125 C70,126.5 70.5,127.5 72,127.5 C73,127.5 73.5,127 73.5,126 L73.5,115 L75.5,115 L75.5,126 C75.5,128.5 74,130 72,130 C69.5,130 68,128.5 68,126 Z" />
+
+    <path
+        android:fillColor="#A31B1B"
+        android:pathData="M80,122.5 C80,118 82.5,115 86,115 C89,115 91,117 91,120 L89,120.5 C89,118.5 87.5,117 86,117 C83.5,117 81.5,119 81.5,122.5 C81.5,126 83.5,128 86,128 C87.5,128 89,126.5 89,124.5 L91,125 C91,128 89,130 86,130 C82.5,130 80,127 80,122.5 Z" />
+    <path
+        android:fillColor="#A31B1B"
+        android:pathData="M94,125 C94,123 95,122 97,122 C98.5,122 99,122.5 99,123.5 L99,130 L97,130 L97,123.5 C97,123 96.5,123 96.5,123 C95.5,123 95,123.5 95,124.5 L95,130 L94,130 Z" />
+    <path
+        android:fillColor="#A31B1B"
+        android:pathData="M102,115 L104,115 L104,130 L102,130 Z" />
+    <path
+        android:fillColor="#A31B1B"
+        android:pathData="M107,122.5 C107,118 109.5,115 113,115 C116,115 118,117 118,120 L116,120.5 C116,118.5 114.5,117 113,117 C110.5,117 108.5,119 108.5,122.5 C108.5,126 110.5,128 113,128 C114.5,128 116,126.5 116,124.5 L118,125 C118,128 116,130 113,130 C109.5,130 107,127 107,122.5 Z" />
+</vector>

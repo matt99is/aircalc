@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(./gradlew test:*)",
+      "Bash(./gradlew:*)",
+      "Bash(java:*)",
+      "Bash(gradle wrapper:*)",
+      "Bash(curl:*)",
+      "Bash(find:*)",
+      "Bash(.gradlew build)",
+      "Read(//c/Users/mattl/Desktop/Airfryer/**)",
+      "Bash(dir \"C:\\Users\\mattl\\helloworld-v2\\app\\src\\main\\res\")",
+      "Bash(findstr:*)",
+      "Bash(cat:*)",
+      "Bash(dir:*)",
+      "Read(//c/Users/mattl/Desktop/**)",
+      "Bash(xcopy:*)",
+      "Bash(robocopy:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(del nul)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Backup rules for AirCalc
+   See https://developer.android.com/guide/topics/data/autobackup
+   Note: This file is ignored for devices older than API 31
+-->
+<full-backup-content>
+    <!-- Exclude cache directory from backup -->
+    <exclude domain="cache" path="." />
+    <!-- Exclude shared preferences (app doesn't store user data) -->
+    <exclude domain="sharedpref" path="." />
+</full-backup-content>

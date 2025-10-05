@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash screen colors matching the design -->
+    <color name="splash_background">#FFF8E6</color>
+    <color name="splash_green">#2D5A3D</color>
+    <color name="splash_red">#B85C38</color>
+</resources>
