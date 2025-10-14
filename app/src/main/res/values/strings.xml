@@ -1,3 +1,93 @@
 <resources>
     <string name="app_name">AirCalc</string>
+
+    <!-- Main Activity Strings -->
+    <string name="temperature">Temperature</string>
+    <string name="cooking_time">Cooking time</string>
+    <string name="convert">Convert</string>
+    <string name="convert_to_air_fryer">Convert to Air Fryer</string>
+
+    <!-- Accessibility -->
+    <string name="decrease_temperature">Decrease temperature</string>
+    <string name="increase_temperature">Increase temperature</string>
+    <string name="decrease_cooking_time">Decrease cooking time</string>
+    <string name="increase_cooking_time">Increase cooking time</string>
+    <string name="current_temperature">Current temperature %1$d %2$s</string>
+    <string name="current_cooking_time">Current cooking time %1$d minutes</string>
+    <string name="select_food_category">Select %1$s food category</string>
+    <string name="convert_oven_settings">Convert oven settings to air fryer settings</string>
+    <string name="timer_time_left">Timer: %1$s</string>
+
+    <!-- Food Categories Display Names -->
+    <string name="ready_meals">Ready meals</string>
+    <string name="raw_meat">Raw meat</string>
+    <string name="veg">Veg</string>
+    <string name="frozen">Frozen</string>
+
+    <!-- Food Categories Descriptions -->
+    <string name="refrigerated_ready_meals_desc">Pre-cooked meals that require reheating with reduced cooking times.</string>
+    <string name="meats_raw_desc">Raw meat products that require thorough cooking and proper temperature control.</string>
+    <string name="fresh_vegetables_desc">Fresh vegetables that cook quickly and develop a crispy exterior.</string>
+    <string name="frozen_foods_desc">Frozen items that may need slightly longer cooking times but cook evenly.</string>
+    <string name="default_category_desc">Select a food category to see cooking guidance and tips.</string>
+
+    <!-- Results Screen -->
+    <string name="air_fryer_settings">✨ Air Fryer Settings</string>
+    <string name="temperature_label">Temperature</string>
+    <string name="minutes_label">Minutes</string>
+    <string name="cooking_tip">💡 %1$s</string>
+    <string name="start_timer">⏰ Start %1$d Min Timer</string>
+
+    <!-- Timer -->
+    <string name="times_up">🔔 Time\'s Up!</string>
+    <string name="cooking_timer">⏱️ Cooking Timer</string>
+    <string name="pause">⏸️ Pause</string>
+    <string name="resume">▶️ Resume</string>
+    <string name="reset">🔄 Reset</string>
+
+    <!-- Results Screen Strings -->
+    <string name="go_back">Go back to conversion input</string>
+    <string name="air_fryer_settings_title">Air fryer settings</string>
+    <string name="remaining">Remaining</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="resume_btn">Resume</string>
+    <string name="reset_btn">Reset</string>
+    <string name="timer">Timer</string>
+    <string name="cooking_tips">Cooking tips:</string>
+
+    <!-- Temperature Units -->
+    <string name="celsius_symbol">°C</string>
+    <string name="fahrenheit_symbol">°F</string>
+    <string name="celsius_name">Celsius</string>
+    <string name="fahrenheit_name">Fahrenheit</string>
+
+    <!-- Cooking Tips -->
+    <string name="tip_frozen_foods">Shake basket halfway through cooking</string>
+    <string name="tip_fresh_vegetables">Toss vegetables halfway through for even cooking</string>
+    <string name="tip_raw_meats">Check internal temperature before serving</string>
+    <string name="tip_baked_goods">Use parchment paper and check frequently</string>
+    <string name="tip_ready_meals">Pierce any sealed packaging before cooking</string>
+
+    <!-- Food Category Full Descriptions (for info screens) -->
+    <string name="desc_frozen_foods">Frozen fries, nuggets, vegetables</string>
+    <string name="desc_fresh_vegetables">Broccoli, carrots, Brussels sprouts</string>
+    <string name="desc_raw_meats">Chicken, beef, pork, fish</string>
+    <string name="desc_baked_goods">Cookies, muffins, pastries</string>
+    <string name="desc_ready_meals">Pre-made meals, leftovers</string>
+
+    <!-- Temperature Display -->
+    <string name="temperature_value">%1$d%2$s</string>
+    <string name="time_value">%1$d %2$s</string>
+
+    <!-- Validation Error Messages -->
+    <string name="error_temperature_too_low">Temperature is too low for safe cooking</string>
+    <string name="error_temperature_too_high">Temperature is too high for this appliance</string>
+    <string name="error_time_too_short">Cooking time is too short</string>
+    <string name="error_time_too_long">Cooking time is unusually long</string>
+    <string name="error_temp_high_baked_goods">Temperature too high for baked goods - may burn</string>
+    <string name="error_temp_low_vegetables">Temperature too low for vegetables - may not cook properly</string>
+    <string name="error_temp_low_raw_meat">Temperature too low for raw meat - food safety concern</string>
+    <string name="error_air_fryer_temp_too_low">Resulting air fryer temperature is too low</string>
+    <string name="error_cooking_time_too_short">Resulting cooking time is too short</string>
 </resources>

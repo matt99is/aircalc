@@ -14,7 +14,7 @@ data class AirFryerUiState(
     // Input state
     val ovenTemperature: Int = 350,
     val cookingTime: Int = 25,
-    val selectedCategory: FoodCategory? = FoodCategory.FROZEN_FOODS,
+    val selectedCategory: FoodCategory? = FoodCategory.READY_MEALS,
     val temperatureUnit: TemperatureUnit = TemperatureUnit.FAHRENHEIT,
 
     // Conversion state

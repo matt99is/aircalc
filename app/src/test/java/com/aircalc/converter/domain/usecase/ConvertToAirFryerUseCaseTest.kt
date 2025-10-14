@@ -189,16 +189,16 @@ class ConvertToAirFryerUseCaseTest {
     }
 
     @Test
-    fun `getQuickEstimate calculates correct estimate for baked goods`() {
+    fun `getQuickEstimate calculates correct estimate for ready meals`() {
         val estimate = useCase.getQuickEstimate(
             temperature = 350,
             time = 25,
-            category = FoodCategory.BAKED_GOODS,
+            category = FoodCategory.READY_MEALS,
             unit = TemperatureUnit.FAHRENHEIT
         )
 
         assertThat(estimate.estimatedTemperature).isEqualTo(325) // 350 - 25
-        assertThat(estimate.estimatedTime).isEqualTo(17)         // 25 * 0.7
+        assertThat(estimate.estimatedTime).isEqualTo(18)         // 25 * 0.75
         assertThat(estimate.temperatureUnit).isEqualTo(TemperatureUnit.FAHRENHEIT)
     }
 
@@ -300,7 +300,7 @@ class ConvertToAirFryerUseCaseTest {
     fun `execute handles complete validation failure with real validator`() = runTest {
         val realValidator = ConversionValidator()
         val realUseCase = ConvertToAirFryerUseCase(mockRepository, realValidator)
-        val invalidInput = TestData.Invalid.temperatureTooLowF.build()
+        val invalidInput = TestData.Invalid.temperatureTooLowF
 
         val result = realUseCase.execute(invalidInput)
 

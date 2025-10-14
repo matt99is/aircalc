@@ -69,7 +69,6 @@ object TestData {
     val frozenFoods = FoodCategory.FROZEN_FOODS
     val freshVegetables = FoodCategory.FRESH_VEGETABLES
     val rawMeats = FoodCategory.RAW_MEATS
-    val bakedGoods = FoodCategory.BAKED_GOODS
     val readyMeals = FoodCategory.READY_MEALS
 
     // Common temperature/time combinations
@@ -134,36 +133,42 @@ object TestData {
             .withTime(25)
             .withCategory(frozenFoods)
             .withUnit(TemperatureUnit.FAHRENHEIT)
+            .build()
 
         val temperatureTooHighF = ConversionInputBuilder()
             .withTemperature(501)
             .withTime(25)
             .withCategory(frozenFoods)
             .withUnit(TemperatureUnit.FAHRENHEIT)
+            .build()
 
         val temperatureTooLowC = ConversionInputBuilder()
             .withTemperature(92)
             .withTime(25)
             .withCategory(frozenFoods)
             .withUnit(TemperatureUnit.CELSIUS)
+            .build()
 
         val temperatureTooHighC = ConversionInputBuilder()
             .withTemperature(261)
             .withTime(25)
             .withCategory(frozenFoods)
             .withUnit(TemperatureUnit.CELSIUS)
+            .build()
 
         val timeTooShort = ConversionInputBuilder()
             .withTemperature(375)
             .withTime(0)
             .withCategory(frozenFoods)
             .withUnit(TemperatureUnit.FAHRENHEIT)
+            .build()
 
         val timeTooLong = ConversionInputBuilder()
             .withTemperature(375)
             .withTime(301)
             .withCategory(frozenFoods)
             .withUnit(TemperatureUnit.FAHRENHEIT)
+            .build()
     }
 }
 

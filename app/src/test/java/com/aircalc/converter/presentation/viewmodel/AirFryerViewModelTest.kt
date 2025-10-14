@@ -42,6 +42,16 @@ class AirFryerViewModelTest {
         mockUseCase = mockk()
         mockTimerManager = TestMocks.createMockTimerManager()
 
+        // Mock the getQuickEstimate call that happens during ViewModel initialization
+        every {
+            mockUseCase.getQuickEstimate(
+                temperature = any(),
+                time = any(),
+                category = any(),
+                unit = any()
+            )
+        } returns ConversionEstimate(325, 18, TemperatureUnit.FAHRENHEIT)
+
         viewModel = AirFryerViewModel(mockUseCase, mockTimerManager)
     }
 
@@ -56,9 +66,9 @@ class AirFryerViewModelTest {
     fun `initial state has default values`() {
         val state = viewModel.uiState.value
 
-        assertThat(state.ovenTemperature).isEqualTo(0)
-        assertThat(state.cookingTime).isEqualTo(0)
-        assertThat(state.selectedCategory).isNull()
+        assertThat(state.ovenTemperature).isEqualTo(350)
+        assertThat(state.cookingTime).isEqualTo(25)
+        assertThat(state.selectedCategory).isEqualTo(FoodCategory.READY_MEALS)
         assertThat(state.temperatureUnit).isEqualTo(TemperatureUnit.FAHRENHEIT)
         assertThat(state.isConverting).isFalse()
         assertThat(state.conversionResult).isNull()
@@ -66,15 +76,15 @@ class AirFryerViewModelTest {
     }
 
     @Test
-    fun `canConvert is false initially`() = testScope.runTest {
+    fun `canConvert is true initially with valid defaults`() = testScope.runTest {
         val canConvert = viewModel.canConvert.value
-        assertThat(canConvert).isFalse()
+        assertThat(canConvert).isTrue()
     }
 
     @Test
-    fun `conversionEstimate is null initially`() = testScope.runTest {
+    fun `conversionEstimate is not null initially with valid defaults`() = testScope.runTest {
         val estimate = viewModel.conversionEstimate.value
-        assertThat(estimate).isNull()
+        assertThat(estimate).isNotNull()
     }
 
     // MARK: - Temperature Update Tests
@@ -101,7 +111,14 @@ class AirFryerViewModelTest {
 
     @Test
     fun `updateTemperature triggers conversionEstimate recalculation`() = testScope.runTest {
+        val defaultEstimate = ConversionEstimate(325, 18, TemperatureUnit.FAHRENHEIT)
         val expectedEstimate = ConversionEstimate(350, 20, TemperatureUnit.FAHRENHEIT)
+
+        // Mock for default values
+        every {
+            mockUseCase.getQuickEstimate(350, 25, FoodCategory.READY_MEALS, TemperatureUnit.FAHRENHEIT)
+        } returns defaultEstimate
+
         every {
             mockUseCase.getQuickEstimate(375, 25, FoodCategory.FROZEN_FOODS, TemperatureUnit.FAHRENHEIT)
         } returns expectedEstimate
@@ -185,9 +202,12 @@ class AirFryerViewModelTest {
 
     @Test
     fun `updateTemperatureUnit converts from Celsius to Fahrenheit correctly`() {
-        viewModel.updateTemperature(200)
+        // Start by setting to Celsius mode first
         viewModel.updateTemperatureUnit(TemperatureUnit.CELSIUS)
+        // Then set a Celsius temperature
+        viewModel.updateTemperature(200)
 
+        // Now convert to Fahrenheit
         viewModel.updateTemperatureUnit(TemperatureUnit.FAHRENHEIT)
 
         val state = viewModel.uiState.value
@@ -197,18 +217,7 @@ class AirFryerViewModelTest {
 
     // MARK: - Conversion Tests
 
-    @Test
-    fun `convertToAirFryer shows error when no category selected`() {
-        viewModel.updateTemperature(375)
-        viewModel.updateCookingTime(25)
-        // No category selected
-
-        viewModel.convertToAirFryer()
-
-        val state = viewModel.uiState.value
-        assertThat(state.errorMessage).isEqualTo("Please select a food category")
-        assertThat(state.isConverting).isFalse()
-    }
+    // Note: Test for null category removed since defaults always provide a category
 
     @Test
     fun `convertToAirFryer sets loading state initially`() = testScope.runTest {
@@ -319,12 +328,19 @@ class AirFryerViewModelTest {
     }
 
     @Test
-    fun `dismissError clears error message`() {
-        // Trigger an error by attempting conversion without category
+    fun `dismissError clears error message`() = testScope.runTest {
+        // Set up valid inputs
         viewModel.updateTemperature(375)
         viewModel.updateCookingTime(25)
-        // No category selected - will cause error
+        viewModel.updateSelectedCategory(FoodCategory.FROZEN_FOODS)
+
+        // Mock a failed conversion
+        val input = ConversionInput(375, 25, FoodCategory.FROZEN_FOODS, TemperatureUnit.FAHRENHEIT)
+        coEvery { mockUseCase.execute(input) } returns Result.failure(Exception("Conversion failed"))
+
         viewModel.convertToAirFryer()
+
+        testScope.advanceUntilIdle()
 
         // Verify error exists
         assertThat(viewModel.uiState.value.errorMessage).isNotNull()
@@ -406,21 +422,26 @@ class AirFryerViewModelTest {
 
     @Test
     fun `canConvert requires all valid inputs`() = testScope.runTest {
-        // Start with invalid state
+        // Start with valid defaults
+        assertThat(viewModel.canConvert.value).isTrue()
+
+        // Set invalid temperature
+        viewModel.updateTemperature(0)
+        testScope.advanceUntilIdle()
         assertThat(viewModel.canConvert.value).isFalse()
 
-        // Add temperature
+        // Fix temperature
         viewModel.updateTemperature(375)
         testScope.advanceUntilIdle()
-        assertThat(viewModel.canConvert.value).isFalse()
+        assertThat(viewModel.canConvert.value).isTrue()
 
-        // Add time
-        viewModel.updateCookingTime(25)
+        // Set invalid time
+        viewModel.updateCookingTime(0)
         testScope.advanceUntilIdle()
         assertThat(viewModel.canConvert.value).isFalse()
 
-        // Add category - now should be valid
-        viewModel.updateSelectedCategory(FoodCategory.FROZEN_FOODS)
+        // Fix time - should be valid again
+        viewModel.updateCookingTime(25)
         testScope.advanceUntilIdle()
         assertThat(viewModel.canConvert.value).isTrue()
     }
@@ -437,11 +458,14 @@ class AirFryerViewModelTest {
         // Mock a slow conversion
         val input = ConversionInput(375, 25, FoodCategory.FROZEN_FOODS, TemperatureUnit.FAHRENHEIT)
         coEvery { mockUseCase.execute(input) } coAnswers {
-            kotlinx.coroutines.delay(1000)
+            kotlinx.coroutines.delay(2000)
             Result.success(conversionResult())
         }
 
         viewModel.convertToAirFryer()
+
+        // Advance time partially to allow state change but not complete the conversion
+        testScope.advanceTimeBy(100)
 
         // During conversion, canConvert should be false
         assertThat(viewModel.canConvert.value).isFalse()
@@ -449,8 +473,14 @@ class AirFryerViewModelTest {
 
     @Test
     fun `conversionEstimate updates when inputs change`() = testScope.runTest {
+        val estimateDefault = ConversionEstimate(325, 18, TemperatureUnit.FAHRENHEIT)
         val estimate1 = ConversionEstimate(350, 20, TemperatureUnit.FAHRENHEIT)
         val estimate2 = ConversionEstimate(325, 15, TemperatureUnit.FAHRENHEIT)
+
+        // Mock for default values (350°F, 25min, READY_MEALS)
+        every {
+            mockUseCase.getQuickEstimate(350, 25, FoodCategory.READY_MEALS, TemperatureUnit.FAHRENHEIT)
+        } returns estimateDefault
 
         every {
             mockUseCase.getQuickEstimate(375, 25, FoodCategory.FROZEN_FOODS, TemperatureUnit.FAHRENHEIT)

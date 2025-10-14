@@ -10,21 +10,6 @@
         android:fillColor="#FFF8E6"
         android:pathData="M55,55m-55,0a55,55 0 1,0 110,0a55,55 0 1,0 -110,0" />
 
-    <!-- Shadow gradient - positioned at center (33 + 22 = 55, 34 + 31 = 65 for center) -->
-    <path
-        android:pathData="M70.875,96L33,51.5L42.9167,41L75,34L107.958,79L70.875,96Z">
-        <aapt:attr name="android:fillColor" xmlns:aapt="http://schemas.android.com/aapt">
-            <gradient
-                android:type="linear"
-                android:startX="59.875"
-                android:startY="50.625"
-                android:endX="128.167"
-                android:endY="119.375"
-                android:startColor="#FFF1CE"
-                android:endColor="#FFF8E6" />
-        </aapt:attr>
-    </path>
-
     <!-- Air fryer pot - positioned at center (33 for X offset, 34 for Y offset to center 44x42 in 110x110) -->
     <path
         android:fillColor="#014B38"

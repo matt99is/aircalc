@@ -75,20 +75,20 @@ class ConversionDataSourceTest {
     }
 
     @Test
-    fun `performConversion calculates correct air fryer settings for baked goods`() {
+    fun `performConversion calculates correct air fryer settings for ready meals`() {
         val input = conversionInput(
             temperature = 350,
             time = 25,
-            category = FoodCategory.BAKED_GOODS,
+            category = FoodCategory.READY_MEALS,
             unit = TemperatureUnit.FAHRENHEIT
         )
 
         val result = dataSource.performConversion(input)
 
         assertThat(result.airFryerTemperature).isEqualTo(325) // 350 - 25
-        assertThat(result.airFryerTimeMinutes).isEqualTo(17)  // 25 * 0.7
+        assertThat(result.airFryerTimeMinutes).isEqualTo(18)  // 25 * 0.75
         assertThat(result.temperatureReduction).isEqualTo(25)
-        assertThat(result.timeReduction).isEqualTo(8) // 25 - 17
+        assertThat(result.timeReduction).isEqualTo(7) // 25 - 18
     }
 
     @Test
@@ -152,11 +152,10 @@ class ConversionDataSourceTest {
     fun `getFoodCategories returns all available categories`() {
         val categories = dataSource.getFoodCategories()
 
-        assertThat(categories).hasSize(5)
+        assertThat(categories).hasSize(4)
         assertThat(categories).contains(FoodCategory.FROZEN_FOODS)
         assertThat(categories).contains(FoodCategory.FRESH_VEGETABLES)
         assertThat(categories).contains(FoodCategory.RAW_MEATS)
-        assertThat(categories).contains(FoodCategory.BAKED_GOODS)
         assertThat(categories).contains(FoodCategory.READY_MEALS)
     }
 

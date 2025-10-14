@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme - LIGHT MODE -->
-    <style name="Theme.AirCalc" parent="android:Theme.Material.Light.NoActionBar">
+    <!-- Base application theme - DARK MODE -->
+    <style name="Theme.AirCalc" parent="android:Theme.Material.NoActionBar">
         <!-- Disable dynamic colors to prevent system accent color tinting -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
 
-        <!-- Light mode status bar configuration -->
+        <!-- Dark mode status bar configuration - TRANSPARENT with WHITE icons -->
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o">false</item>
 
         <!-- Ensure window draws system bars -->
         <item name="android:windowDrawsSystemBarBackgrounds" tools:targetApi="lollipop">true</item>

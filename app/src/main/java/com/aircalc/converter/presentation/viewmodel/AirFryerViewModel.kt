@@ -36,8 +36,13 @@ class AirFryerViewModel @Inject constructor(
         state.selectedCategory != null
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = false
+        started = SharingStarted.Eagerly,
+        initialValue = AirFryerUiState().let { state ->
+            !state.isConverting &&
+            state.temperatureUnit.isValidTemperature(state.ovenTemperature) &&
+            state.cookingTime in 1..300 &&
+            state.selectedCategory != null
+        }
     )
 
     val conversionEstimate: StateFlow<ConversionEstimate?> = _uiState.map { state ->
@@ -51,8 +56,18 @@ class AirFryerViewModel @Inject constructor(
         } else null
     }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
+        started = SharingStarted.Eagerly,
+        initialValue = AirFryerUiState().let { state ->
+            val category = state.selectedCategory
+            if (category != null && state.ovenTemperature > 0 && state.cookingTime > 0) {
+                convertToAirFryerUseCase.getQuickEstimate(
+                    temperature = state.ovenTemperature,
+                    time = state.cookingTime,
+                    category = category,
+                    unit = state.temperatureUnit
+                )
+            } else null
+        }
     )
 
     /**

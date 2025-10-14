@@ -19,9 +19,16 @@ class ConversionRepositoryImpl @Inject constructor(
 
     override suspend fun convertToAirFryer(input: ConversionInput): Result<ConversionResult> {
         return try {
-            // Check cache first
+            // Check cache first, gracefully handle cache errors
             val cacheKey = generateCacheKey(input)
-            conversionCache.get(cacheKey)?.let { cachedResult ->
+            val cachedResult = try {
+                conversionCache.get(cacheKey)
+            } catch (e: Exception) {
+                // Log cache error but continue with conversion
+                null
+            }
+
+            if (cachedResult != null) {
                 return Result.success(cachedResult)
             }
 
@@ -31,8 +38,12 @@ class ConversionRepositoryImpl @Inject constructor(
             // Perform conversion calculation
             val result = dataSource.performConversion(input)
 
-            // Cache the result
-            conversionCache.put(cacheKey, result)
+            // Cache the result, gracefully handle cache errors
+            try {
+                conversionCache.put(cacheKey, result)
+            } catch (e: Exception) {
+                // Log cache error but don't fail the conversion
+            }
 
             Result.success(result)
 

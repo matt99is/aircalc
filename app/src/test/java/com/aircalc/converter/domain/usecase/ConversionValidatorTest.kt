@@ -179,27 +179,23 @@ class ConversionValidatorTest {
     // MARK: - Food Category Compatibility Tests
 
     @Test
-    fun `validateInput rejects temperature too high for baked goods`() {
+    fun `validateInput accepts valid temperature for ready meals`() {
         val input = ConversionInputBuilder()
-            .withTemperature(401) // Too high for baked goods
-            .withCategory(FoodCategory.BAKED_GOODS)
+            .withTemperature(401)
+            .withCategory(FoodCategory.READY_MEALS)
             .withUnit(TemperatureUnit.FAHRENHEIT)
             .build()
 
         val result = validator.validateInput(input)
 
-        assertThat(result.isValid()).isFalse()
-        val invalid = result as ConversionValidation.Invalid
-        assertThat(invalid.errors).hasSize(1)
-        val customError = invalid.errors[0] as ValidationError.Custom
-        assertThat(customError.message).contains("Temperature too high for baked goods")
+        assertThat(result.isValid()).isTrue()
     }
 
     @Test
-    fun `validateInput accepts valid temperature for baked goods`() {
+    fun `validateInput accepts another valid temperature for ready meals`() {
         val input = ConversionInputBuilder()
-            .withTemperature(350) // Valid for baked goods
-            .withCategory(FoodCategory.BAKED_GOODS)
+            .withTemperature(350)
+            .withCategory(FoodCategory.READY_MEALS)
             .withUnit(TemperatureUnit.FAHRENHEIT)
             .build()
 
@@ -269,20 +265,17 @@ class ConversionValidatorTest {
 
     @Test
     fun `validateInput handles Celsius temperatures for food category compatibility`() {
-        // Test baked goods with high Celsius temperature
-        // 205°C = ~400°F, should be rejected for baked goods
+        // Test ready meals with high Celsius temperature - should be valid
+        // 205°C = ~401°F, valid for ready meals
         val input = ConversionInputBuilder()
             .withTemperature(205)
-            .withCategory(FoodCategory.BAKED_GOODS)
+            .withCategory(FoodCategory.READY_MEALS)
             .withUnit(TemperatureUnit.CELSIUS)
             .build()
 
         val result = validator.validateInput(input)
 
-        assertThat(result.isValid()).isFalse()
-        val invalid = result as ConversionValidation.Invalid
-        val customError = invalid.errors[0] as ValidationError.Custom
-        assertThat(customError.message).contains("Temperature too high for baked goods")
+        assertThat(result.isValid()).isTrue()
     }
 
     @Test

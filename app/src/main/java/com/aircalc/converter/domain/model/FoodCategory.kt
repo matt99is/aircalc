@@ -44,16 +44,6 @@ data class FoodCategory(
             description = "Chicken, beef, pork, fish"
         )
 
-        val BAKED_GOODS = FoodCategory(
-            id = "baked_goods",
-            displayName = "Baked Goods",
-            icon = "🧁",
-            tempReductionFahrenheit = 25,
-            timeMultiplier = 0.7,
-            cookingTip = "Use parchment paper and check frequently",
-            description = "Cookies, muffins, pastries"
-        )
-
         val READY_MEALS = FoodCategory(
             id = "ready_meals",
             displayName = "Ready Meals",
@@ -68,7 +58,6 @@ data class FoodCategory(
             FROZEN_FOODS,
             FRESH_VEGETABLES,
             RAW_MEATS,
-            BAKED_GOODS,
             READY_MEALS
         )
 

@@ -89,11 +89,6 @@ class ConversionValidator @Inject constructor() {
         }
 
         return when (category.id) {
-            "baked_goods" -> {
-                if (tempInFahrenheit > 400) {
-                    ValidationError.Custom("Temperature too high for baked goods - may burn")
-                } else null
-            }
             "fresh_vegetables" -> {
                 if (tempInFahrenheit < 300) {
                     ValidationError.Custom("Temperature too low for vegetables - may not cook properly")

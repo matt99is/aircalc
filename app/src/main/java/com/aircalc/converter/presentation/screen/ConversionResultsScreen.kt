@@ -4,6 +4,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +28,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.aircalc.converter.R
@@ -71,49 +74,57 @@ fun ConversionResultsScreen(
     onResumeTimer: () -> Unit,
     onResetTimer: () -> Unit,
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showHeader: Boolean = false // Feature flag for header
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
+            .navigationBarsPadding()
     ) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .padding(horizontal = 24.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Back button
-            IconButton(
-                onClick = onNavigateBack,
+        // Header - hidden by default, can be enabled with feature flag
+        if (showHeader) {
+            Row(
                 modifier = Modifier
-                    .size(24.dp)
-                    .semantics {
-                        contentDescription = "Go back to conversion input"
-                    }
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .padding(horizontal = 24.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = PureBlack
+                // Back button
+                IconButton(
+                    onClick = onNavigateBack,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .semantics {
+                            contentDescription = "Go back to conversion input"
+                        }
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = null,
+                        tint = PureBlack
+                    )
+                }
+
+                // App title
+                Text(
+                    text = stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = PureBlack,
+                    textAlign = TextAlign.Center
                 )
+
+                // Spacer to balance the layout
+                Spacer(modifier = Modifier.width(24.dp))
             }
-
-            // App title
-            Text(
-                text = "AirCalc",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = PureBlack,
-                textAlign = TextAlign.Center
-            )
-
-            // Spacer to balance the layout
-            Spacer(modifier = Modifier.width(24.dp))
+        } else {
+            // Add spacing when header is hidden
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         Column(
@@ -169,30 +180,32 @@ private fun AirFryerSettingsCard(
     conversionResult: ConversionResult,
     modifier: Modifier = Modifier
 ) {
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = androidx.compose.ui.graphics.Color(0xFFF0F0F0),
+                color = if (isDark) MaterialTheme.colorScheme.tertiaryContainer else LightGray,
                 shape = RoundedCornerShape(10.dp)
             )
-            .padding(vertical = 16.dp)
+            .padding(vertical = 12.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Air fryer settings",
+                text = stringResource(R.string.air_fryer_settings_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium,
-                color = PureBlack,
+                color = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PureBlack,
                 modifier = Modifier.semantics {
                     contentDescription = "Air fryer conversion results"
                 }
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -202,9 +215,9 @@ private fun AirFryerSettingsCard(
                 // Temperature
                 Text(
                     text = "${conversionResult.airFryerTemperature}°",
-                    fontSize = 48.sp,
+                    fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = PureBlack,
+                    color = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PureBlack,
                     modifier = Modifier.semantics {
                         contentDescription = "Air fryer temperature ${conversionResult.airFryerTemperature} degrees"
                     }
@@ -214,16 +227,19 @@ private fun AirFryerSettingsCard(
                 Box(
                     modifier = Modifier
                         .width(1.dp)
-                        .height(60.dp)
-                        .background(androidx.compose.ui.graphics.Color(0xFFD1D5DB))
+                        .height(48.dp)
+                        .background(
+                            if (isDark) MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.3f)
+                            else PureBlack.copy(alpha = 0.3f)
+                        )
                 )
 
                 // Time
                 Text(
                     text = "${conversionResult.airFryerTimeMinutes}m",
-                    fontSize = 48.sp,
+                    fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = PureBlack,
+                    color = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PureBlack,
                     modifier = Modifier.semantics {
                         contentDescription = "Air fryer cooking time ${conversionResult.airFryerTimeMinutes} minutes"
                     }
@@ -239,6 +255,8 @@ private fun CircularTimerSection(
     targetMinutes: Int,
     modifier: Modifier = Modifier
 ) {
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth(),
@@ -251,7 +269,7 @@ private fun CircularTimerSection(
             modifier = Modifier
                 .size(circleSize)
                 .background(
-                    color = androidx.compose.ui.graphics.Color(0xFFF0F0F0),
+                    color = if (isDark) DarkInputBackground else LightGray,
                     shape = CircleShape
                 )
         ) {
@@ -268,9 +286,9 @@ private fun CircularTimerSection(
                 val radius = (size.minDimension - strokeWidth) / 2
                 val center = Offset(size.width / 2, size.height / 2)
 
-                // Background circle (light gray) - now using F0F0F0 as solid background
+                // Background circle (black for dark mode)
                 drawCircle(
-                    color = androidx.compose.ui.graphics.Color(0xFFF0F0F0),
+                    color = androidx.compose.ui.graphics.Color.Transparent,
                     radius = radius,
                     center = center
                 )
@@ -300,7 +318,7 @@ private fun CircularTimerSection(
                     text = formatTime(timerState.timeLeftSeconds),
                     style = MaterialTheme.typography.displayLarge,
                     fontWeight = FontWeight.Bold,
-                    color = PureBlack,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
                     fontSize = 48.sp,
                     modifier = Modifier.semantics {
                         contentDescription = "Timer: ${formatTime(timerState.timeLeftSeconds)}"
@@ -308,10 +326,10 @@ private fun CircularTimerSection(
                 )
 
                 Text(
-                    text = "Remaining",
+                    text = stringResource(R.string.remaining),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
-                    color = PureBlack
+                    color = MaterialTheme.colorScheme.onTertiaryContainer
                 )
             }
         }
@@ -327,6 +345,8 @@ private fun TimerControlButtons(
     onResetTimer: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -350,7 +370,7 @@ private fun TimerControlButtons(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
-                    text = "Start",
+                    text = stringResource(R.string.start),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -379,7 +399,7 @@ private fun TimerControlButtons(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
-                    text = "Stop",
+                    text = stringResource(R.string.stop),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -406,28 +426,31 @@ private fun TimerControlButtons(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
-                    text = "Resume",
+                    text = stringResource(R.string.resume_btn),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
             }
         }
 
-        // Reset Button - Cream background with red outline
+        // Reset Button
         OutlinedButton(
             onClick = onResetTimer,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
             colors = ButtonDefaults.outlinedButtonColors(
-                containerColor = CreamBackground,
-                contentColor = PrimaryRed
+                containerColor = if (isDark) MaterialTheme.colorScheme.tertiaryContainer else CreamBackground,
+                contentColor = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PrimaryRed
             ),
-            border = androidx.compose.foundation.BorderStroke(2.dp, PrimaryRed),
+            border = androidx.compose.foundation.BorderStroke(
+                2.dp,
+                if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PrimaryRed
+            ),
             shape = RoundedCornerShape(16.dp)
         ) {
             Text(
-                text = "Reset",
+                text = stringResource(R.string.reset_btn),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -454,7 +477,7 @@ private fun TimerSection(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Timer",
+                text = stringResource(R.string.timer),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -547,10 +570,12 @@ private fun CookingTipsCard(
     category: FoodCategory,
     modifier: Modifier = Modifier
 ) {
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = LightGray
+            containerColor = if (isDark) MaterialTheme.colorScheme.tertiaryContainer else LightGray
         ),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -565,53 +590,48 @@ private fun CookingTipsCard(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_lightbulb),
                     contentDescription = null,
-                    tint = PrimaryRed,
+                    tint = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PrimaryRed,
                     modifier = Modifier.size(16.dp)
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = "Cooking tips:",
+                    text = stringResource(R.string.cooking_tips),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = PureBlack
+                    color = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PureBlack
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Get category-specific cooking tips
             val tips = when (category.id) {
                 "frozen_foods" -> listOf(
-                    "Shake basket halfway through cooking",
-                    "No need to preheat for frozen foods",
-                    "Don't overcrowd the basket for crispy results"
+                    "Shake basket halfway through",
+                    "No need to preheat",
+                    "Don't overcrowd for crispy results"
                 )
                 "fresh_vegetables" -> listOf(
-                    "Toss vegetables halfway through for even cooking",
-                    "Light coating of oil helps achieve crispiness",
-                    "Cut vegetables to similar sizes for even cooking"
+                    "Toss halfway through for even cooking",
+                    "Light oil coating helps crispiness",
+                    "Cut to similar sizes"
                 )
                 "raw_meats" -> listOf(
-                    "Check internal temperature before serving",
-                    "Let meat rest for 5 minutes after cooking",
-                    "Pat meat dry before seasoning for best results"
-                )
-                "baked_goods" -> listOf(
-                    "Use parchment paper and check frequently",
-                    "Reduce temperature by 25°F from traditional recipes",
-                    "Check doneness 2-3 minutes earlier than recipe states"
+                    "Check internal temperature",
+                    "Let rest 5 minutes after cooking",
+                    "Pat dry before seasoning"
                 )
                 "ready_meals" -> listOf(
-                    "Pierce any sealed packaging before cooking",
-                    "Stir or rotate halfway through for even heating",
-                    "Let stand for 1-2 minutes before serving"
+                    "Pierce sealed packaging first",
+                    "Stir or rotate halfway through",
+                    "Let stand 1-2 minutes before serving"
                 )
                 else -> listOf(
-                    "Preheat air fryer for 3-5 minutes for best results",
-                    "Don't overcrowd the basket",
-                    "Shake or flip food halfway through cooking"
+                    "Preheat 3-5 minutes",
+                    "Don't overcrowd basket",
+                    "Shake halfway through"
                 )
             }
 
@@ -622,13 +642,13 @@ private fun CookingTipsCard(
                     Text(
                         text = "•",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = PureBlack,
+                        color = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PureBlack,
                         modifier = Modifier.padding(end = 8.dp)
                     )
                     Text(
                         text = tip,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = PureBlack
+                        color = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PureBlack
                     )
                 }
             }

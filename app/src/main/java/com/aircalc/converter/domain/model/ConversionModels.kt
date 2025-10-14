@@ -7,20 +7,14 @@ package com.aircalc.converter.domain.model
 
 /**
  * Input parameters for air fryer conversion.
+ * Validation is handled by ConversionValidator, not in the data class itself.
  */
 data class ConversionInput(
     val ovenTemperature: Int,
     val cookingTimeMinutes: Int,
     val foodCategory: FoodCategory,
     val temperatureUnit: TemperatureUnit
-) {
-    init {
-        require(cookingTimeMinutes > 0) { "Cooking time must be positive" }
-        require(temperatureUnit.isValidTemperature(ovenTemperature)) {
-            "Temperature $ovenTemperature${temperatureUnit.symbol} is outside valid range"
-        }
-    }
-}
+)
 
 /**
  * Result of air fryer conversion with all calculated values.

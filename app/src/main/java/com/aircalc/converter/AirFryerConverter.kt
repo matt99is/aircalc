@@ -32,14 +32,6 @@ enum class FoodCategory(
         "Check internal temperature before serving",
         "Chicken, beef, pork, fish"
     ),
-    BAKED_GOODS(
-        "Baked Goods",
-        "🧁",
-        25,
-        0.7,
-        "Use parchment paper and check frequently",
-        "Cookies, muffins, pastries"
-    ),
     REFRIGERATED_READY_MEALS(
         "Ready Meals",
         "🍱",
