@@ -27,8 +27,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -49,7 +53,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -103,16 +114,20 @@ class MainActivity : ComponentActivity() {
                 )
             )
 
-            // 3. Force-set colors immediately
+            // 3. HONOR/MagicOS workaround: Force-set colors for devices that don't respect enableEdgeToEdge
+            @Suppress("DEPRECATION")
             window.statusBarColor = android.graphics.Color.BLACK
+            @Suppress("DEPRECATION")
             window.navigationBarColor = android.graphics.Color.BLACK
 
             // 4. Post to decorView to apply after view initialization
             window.decorView.post {
+                @Suppress("DEPRECATION")
                 window.statusBarColor = android.graphics.Color.BLACK
+                @Suppress("DEPRECATION")
                 window.navigationBarColor = android.graphics.Color.BLACK
 
-                androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)?.apply {
+                androidx.core.view.WindowCompat.getInsetsController(window, window.decorView).apply {
                     isAppearanceLightStatusBars = false
                     isAppearanceLightNavigationBars = false
                 }
@@ -772,6 +787,73 @@ fun ModernConvertButton(
 }
 
 
+/**
+ * Modifier that enables hold-to-repeat functionality with 3-phase acceleration.
+ * - Tap: Single increment
+ * - Hold: Continuous increments with acceleration (slow → medium → fast)
+ * - Haptic feedback pulses on each increment
+ */
+@Composable
+fun Modifier.holdToRepeat(
+    onIncrement: () -> Unit,
+    hapticFeedback: androidx.compose.ui.hapticfeedback.HapticFeedback
+): Modifier {
+    val scope = rememberCoroutineScope()
+    // Remember the latest callbacks to avoid stale closures
+    val currentOnIncrement by rememberUpdatedState(onIncrement)
+    val currentHapticFeedback by rememberUpdatedState(hapticFeedback)
+
+    return this.pointerInput(Unit) {
+        awaitEachGesture {
+            awaitFirstDown(requireUnconsumed = false)
+
+            val repeatJob = scope.launch(Dispatchers.Default) {
+                // Initial increment
+                withContext(Dispatchers.Main) {
+                    currentHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    currentOnIncrement()
+                }
+
+                delay(300) // Initial delay
+
+                // Phase 1: Slow (8 increments at 200ms intervals)
+                repeat(8) {
+                    withContext(Dispatchers.Main) {
+                        currentHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        currentOnIncrement()
+                    }
+                    delay(200)
+                }
+
+                // Phase 2: Medium (10 increments at 150ms intervals)
+                repeat(10) {
+                    withContext(Dispatchers.Main) {
+                        currentHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        currentOnIncrement()
+                    }
+                    delay(150)
+                }
+
+                // Phase 3: Fast (continuous at 80ms intervals)
+                while (true) {
+                    withContext(Dispatchers.Main) {
+                        currentHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                        currentOnIncrement()
+                    }
+                    delay(80)
+                }
+            }
+
+            // Wait for release
+            do {
+                val event = awaitPointerEvent()
+            } while (event.changes.any { it.pressed })
+
+            repeatJob.cancel()
+        }
+    }
+}
+
 @Composable
 fun TemperatureInputSection(
     temperature: Int,
@@ -784,6 +866,7 @@ fun TemperatureInputSection(
     val increment = 5
 
     val focusManager = LocalFocusManager.current
+    val hapticFeedback = LocalHapticFeedback.current
 
     Card(
         modifier = Modifier
@@ -807,26 +890,31 @@ fun TemperatureInputSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Far left: Minus button
-            FilledIconButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    if (temperature > minTemp) {
-                        onTemperatureChange(temperature - increment)
-                    }
-                },
+            Box(
                 modifier = Modifier
                     .size(70.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = CircleShape
+                    )
+                    .holdToRepeat(
+                        onIncrement = {
+                            focusManager.clearFocus()
+                            if (temperature > minTemp) {
+                                onTemperatureChange(temperature - increment)
+                            }
+                        },
+                        hapticFeedback = hapticFeedback
+                    )
                     .semantics { contentDescription = "Decrease temperature" },
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                shape = CircleShape
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "−",
                     fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             }
 
@@ -866,26 +954,31 @@ fun TemperatureInputSection(
             }
 
             // Far right: Plus button
-            FilledIconButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    if (temperature < maxTemp) {
-                        onTemperatureChange(temperature + increment)
-                    }
-                },
+            Box(
                 modifier = Modifier
                     .size(70.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = CircleShape
+                    )
+                    .holdToRepeat(
+                        onIncrement = {
+                            focusManager.clearFocus()
+                            if (temperature < maxTemp) {
+                                onTemperatureChange(temperature + increment)
+                            }
+                        },
+                        hapticFeedback = hapticFeedback
+                    )
                     .semantics { contentDescription = "Increase temperature" },
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                shape = CircleShape
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "+",
                     fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             }
         }
@@ -903,6 +996,7 @@ fun TimeInputSection(
     val increment = 1
 
     val focusManager = LocalFocusManager.current
+    val hapticFeedback = LocalHapticFeedback.current
 
     Card(
         modifier = Modifier
@@ -926,26 +1020,31 @@ fun TimeInputSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Far left: Minus button
-            FilledIconButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    if (time > minTime) {
-                        onTimeChange(maxOf(minTime, time - increment))
-                    }
-                },
+            Box(
                 modifier = Modifier
                     .size(70.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = CircleShape
+                    )
+                    .holdToRepeat(
+                        onIncrement = {
+                            focusManager.clearFocus()
+                            if (time > minTime) {
+                                onTimeChange(maxOf(minTime, time - increment))
+                            }
+                        },
+                        hapticFeedback = hapticFeedback
+                    )
                     .semantics { contentDescription = "Decrease cooking time" },
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                shape = CircleShape
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "−",
                     fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             }
 
@@ -985,26 +1084,31 @@ fun TimeInputSection(
             }
 
             // Far right: Plus button
-            FilledIconButton(
-                onClick = {
-                    focusManager.clearFocus()
-                    if (time < maxTime) {
-                        onTimeChange(minOf(maxTime, time + increment))
-                    }
-                },
+            Box(
                 modifier = Modifier
                     .size(70.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = CircleShape
+                    )
+                    .holdToRepeat(
+                        onIncrement = {
+                            focusManager.clearFocus()
+                            if (time < maxTime) {
+                                onTimeChange(minOf(maxTime, time + increment))
+                            }
+                        },
+                        hapticFeedback = hapticFeedback
+                    )
                     .semantics { contentDescription = "Increase cooking time" },
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                shape = CircleShape
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "+",
                     fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             }
         }

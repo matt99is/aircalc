@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    namespace 'com.aircalc.converter'
+    namespace = 'com.aircalc.converter'
     compileSdk 35
 
     defaultConfig {
         applicationId "com.aircalc.converter"
         minSdk 24
         targetSdk 35
-        versionCode 5
-        versionName "1.4"
+        versionCode 6
+        versionName "1.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -35,10 +35,10 @@ android {
     buildTypes {
         release {
             if (project.hasProperty('RELEASE_STORE_FILE')) {
-                signingConfig signingConfigs.release
+                signingConfig = signingConfigs.release
             }
             minifyEnabled true
-            shrinkResources true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -57,10 +57,10 @@ android {
         }
     }
     buildFeatures {
-        compose true
+        compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.5.11'
+        kotlinCompilerExtensionVersion = '1.5.11'
     }
 }
 

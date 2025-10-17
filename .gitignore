@@ -94,6 +94,12 @@ Thumbs.db
 # Node modules
 node_modules/
 
+# VS Code
+.vscode/
+
+# Build output logs
+build_output.txt
+
 # Analysis reports (optional - uncomment to exclude)
 # *_ANALYSIS*.md
 # *_REPORT.md
