@@ -32,12 +32,12 @@ class ConversionDataSourceTest {
 
         assertThat(result.originalTemperature).isEqualTo(400)
         assertThat(result.originalTime).isEqualTo(30)
-        assertThat(result.airFryerTemperature).isEqualTo(375) // 400 - 25
-        assertThat(result.airFryerTimeMinutes).isEqualTo(24)  // 30 * 0.8
+        assertThat(result.airFryerTemperature).isEqualTo(400) // 400 - 0 (no temp reduction)
+        assertThat(result.airFryerTimeMinutes).isEqualTo(15)  // 30 * 0.5
         assertThat(result.temperatureUnit).isEqualTo(TemperatureUnit.FAHRENHEIT)
         assertThat(result.foodCategory).isEqualTo(FoodCategory.FROZEN_FOODS)
-        assertThat(result.temperatureReduction).isEqualTo(25)
-        assertThat(result.timeReduction).isEqualTo(6) // 30 - 24
+        assertThat(result.temperatureReduction).isEqualTo(0)
+        assertThat(result.timeReduction).isEqualTo(15) // 30 - 15
     }
 
     @Test
@@ -51,10 +51,10 @@ class ConversionDataSourceTest {
 
         val result = dataSource.performConversion(input)
 
-        assertThat(result.airFryerTemperature).isEqualTo(345) // 375 - 30
-        assertThat(result.airFryerTimeMinutes).isEqualTo(30)  // 40 * 0.75
-        assertThat(result.temperatureReduction).isEqualTo(30)
-        assertThat(result.timeReduction).isEqualTo(10) // 40 - 30
+        assertThat(result.airFryerTemperature).isEqualTo(350) // 375 - 25
+        assertThat(result.airFryerTimeMinutes).isEqualTo(32)  // 40 * 0.80
+        assertThat(result.temperatureReduction).isEqualTo(25)
+        assertThat(result.timeReduction).isEqualTo(8) // 40 - 32
     }
 
     @Test
@@ -69,9 +69,9 @@ class ConversionDataSourceTest {
         val result = dataSource.performConversion(input)
 
         assertThat(result.airFryerTemperature).isEqualTo(400) // 425 - 25
-        assertThat(result.airFryerTimeMinutes).isEqualTo(51)  // 60 * 0.85
+        assertThat(result.airFryerTimeMinutes).isEqualTo(48)  // 60 * 0.80
         assertThat(result.temperatureReduction).isEqualTo(25)
-        assertThat(result.timeReduction).isEqualTo(9) // 60 - 51
+        assertThat(result.timeReduction).isEqualTo(12) // 60 - 48
     }
 
     @Test
@@ -102,11 +102,11 @@ class ConversionDataSourceTest {
 
         val result = dataSource.performConversion(input)
 
-        // Temperature reduction: 25°F = ~14°C (25/1.8 = 13.89 -> 13)
-        assertThat(result.airFryerTemperature).isEqualTo(187) // 200 - 13
-        assertThat(result.airFryerTimeMinutes).isEqualTo(24)  // 30 * 0.8
+        // Temperature reduction: 0°F = 0°C (no reduction for frozen foods)
+        assertThat(result.airFryerTemperature).isEqualTo(200) // 200 - 0
+        assertThat(result.airFryerTimeMinutes).isEqualTo(15)  // 30 * 0.5
         assertThat(result.temperatureUnit).isEqualTo(TemperatureUnit.CELSIUS)
-        assertThat(result.temperatureReduction).isEqualTo(13)
+        assertThat(result.temperatureReduction).isEqualTo(0)
     }
 
     @Test
@@ -129,8 +129,8 @@ class ConversionDataSourceTest {
 
         val result = dataSource.performConversion(input)
 
-        assertThat(result.airFryerTemperature).isEqualTo(175) // 200 - 25
-        assertThat(result.airFryerTimeMinutes).isEqualTo(0)   // 1 * 0.8 = 0.8 -> 0
+        assertThat(result.airFryerTemperature).isEqualTo(200) // 200 - 0 (no reduction)
+        assertThat(result.airFryerTimeMinutes).isEqualTo(0)   // 1 * 0.5 = 0.5 -> 0
     }
 
     @Test
@@ -144,8 +144,8 @@ class ConversionDataSourceTest {
 
         val result = dataSource.performConversion(input)
 
-        assertThat(result.airFryerTemperature).isEqualTo(475) // 500 - 25
-        assertThat(result.airFryerTimeMinutes).isEqualTo(240) // 300 * 0.8
+        assertThat(result.airFryerTemperature).isEqualTo(500) // 500 - 0 (no reduction)
+        assertThat(result.airFryerTimeMinutes).isEqualTo(150) // 300 * 0.5
     }
 
     @Test

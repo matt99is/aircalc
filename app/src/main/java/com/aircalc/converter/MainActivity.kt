@@ -95,7 +95,33 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        // HONOR/MagicOS FIX: Aggressive multi-layered approach
+        // Apply theme-specific window configuration
+        applyWindowTheme()
+
+        setContent {
+            AirCalcTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AirFryerConverterApp()
+                }
+            }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        // Re-apply window theme when configuration changes (e.g., dark/light mode switch)
+        applyWindowTheme()
+    }
+
+    /**
+     * Apply window configuration based on current theme.
+     * Called both on initial creation and when theme changes.
+     */
+    private fun applyWindowTheme() {
         val isDarkMode = (resources.configuration.uiMode and
             android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
             android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -144,17 +170,6 @@ class MainActivity : ComponentActivity() {
                     darkScrim = android.graphics.Color.TRANSPARENT
                 )
             )
-        }
-
-        setContent {
-            AirCalcTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    AirFryerConverterApp()
-                }
-            }
         }
     }
 }

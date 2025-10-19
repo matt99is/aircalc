@@ -155,8 +155,8 @@ class ConvertToAirFryerUseCaseTest {
             unit = TemperatureUnit.FAHRENHEIT
         )
 
-        assertThat(estimate.estimatedTemperature).isEqualTo(375) // 400 - 25
-        assertThat(estimate.estimatedTime).isEqualTo(24)         // 30 * 0.8
+        assertThat(estimate.estimatedTemperature).isEqualTo(400) // 400 - 0 (no reduction)
+        assertThat(estimate.estimatedTime).isEqualTo(15)         // 30 * 0.5
         assertThat(estimate.temperatureUnit).isEqualTo(TemperatureUnit.FAHRENHEIT)
     }
 
@@ -169,8 +169,8 @@ class ConvertToAirFryerUseCaseTest {
             unit = TemperatureUnit.FAHRENHEIT
         )
 
-        assertThat(estimate.estimatedTemperature).isEqualTo(345) // 375 - 30
-        assertThat(estimate.estimatedTime).isEqualTo(30)         // 40 * 0.75
+        assertThat(estimate.estimatedTemperature).isEqualTo(350) // 375 - 25
+        assertThat(estimate.estimatedTime).isEqualTo(32)         // 40 * 0.80
         assertThat(estimate.temperatureUnit).isEqualTo(TemperatureUnit.FAHRENHEIT)
     }
 
@@ -184,7 +184,7 @@ class ConvertToAirFryerUseCaseTest {
         )
 
         assertThat(estimate.estimatedTemperature).isEqualTo(400) // 425 - 25
-        assertThat(estimate.estimatedTime).isEqualTo(51)         // 60 * 0.85
+        assertThat(estimate.estimatedTime).isEqualTo(48)         // 60 * 0.80
         assertThat(estimate.temperatureUnit).isEqualTo(TemperatureUnit.FAHRENHEIT)
     }
 
@@ -211,9 +211,9 @@ class ConvertToAirFryerUseCaseTest {
             unit = TemperatureUnit.CELSIUS
         )
 
-        // Temperature reduction: 25°F = ~14°C (25/1.8 = 13.89 -> 13)
-        assertThat(estimate.estimatedTemperature).isEqualTo(187) // 200 - 13
-        assertThat(estimate.estimatedTime).isEqualTo(24)         // 30 * 0.8
+        // Temperature reduction: 0°F = 0°C (no reduction for frozen foods)
+        assertThat(estimate.estimatedTemperature).isEqualTo(200) // 200 - 0
+        assertThat(estimate.estimatedTime).isEqualTo(15)         // 30 * 0.5
         assertThat(estimate.temperatureUnit).isEqualTo(TemperatureUnit.CELSIUS)
     }
 
@@ -226,8 +226,8 @@ class ConvertToAirFryerUseCaseTest {
             unit = TemperatureUnit.FAHRENHEIT
         )
 
-        assertThat(estimate.estimatedTemperature).isEqualTo(175) // 200 - 25
-        assertThat(estimate.estimatedTime).isEqualTo(0)          // 1 * 0.8 = 0.8 -> 0
+        assertThat(estimate.estimatedTemperature).isEqualTo(200) // 200 - 0 (no reduction)
+        assertThat(estimate.estimatedTime).isEqualTo(0)          // 1 * 0.5 = 0.5 -> 0
     }
 
     @Test
@@ -239,8 +239,8 @@ class ConvertToAirFryerUseCaseTest {
             unit = TemperatureUnit.FAHRENHEIT
         )
 
-        assertThat(estimate.estimatedTemperature).isEqualTo(475) // 500 - 25
-        assertThat(estimate.estimatedTime).isEqualTo(240)        // 300 * 0.8
+        assertThat(estimate.estimatedTemperature).isEqualTo(500) // 500 - 0 (no reduction)
+        assertThat(estimate.estimatedTime).isEqualTo(150)        // 300 * 0.5
     }
 
     // MARK: - ConversionEstimate Tests
