@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Updated UI colors for better visual consistency
-- Updated privacy policy with Full Bloom Software details
+- Updated privacy policy with GlassLlama details
 
 ### Fixed
 - Fixed status bar display issues

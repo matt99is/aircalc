@@ -215,6 +215,6 @@ Before clicking "Go Live":
 
 ---
 
-**Developer**: Full Bloom Software
+**Developer**: GlassLlama
 **Contact**: matt@glassllama.co.uk
 **Repository**: https://github.com/matt99is/aircalc

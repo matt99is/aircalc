@@ -3,7 +3,7 @@
 **Effective Date:** October 5, 2025
 **Last Updated:** October 5, 2025
 
-Full Bloom Software ("we", "our", or "us") operates the AirCalc mobile application (the "App"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our App.
+GlassLlama ("we", "our", or "us") operates the AirCalc mobile application (the "App"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our App.
 
 ## Information Collection and Use
 
@@ -41,7 +41,7 @@ As we do not collect personal data, there is no personal data for you to access,
 
 If you have any questions about this Privacy Policy, please contact us:
 
-**Full Bloom Software**
+**GlassLlama**
 Email: matt@glassllama.co.uk
 Location: United Kingdom
 
