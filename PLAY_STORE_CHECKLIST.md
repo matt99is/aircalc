@@ -119,7 +119,7 @@
 - [ ] **Content rating**: Complete questionnaire (likely Everyone)
 - [ ] **Target audience**: All ages
 - [ ] **Contact details**:
-  - Email: mattlelonek@gmail.com
+  - Email: matt@glassllama.co.uk
   - Phone: (Optional)
   - Website: https://matt99is.github.io/aircalc/
 
@@ -216,5 +216,5 @@ Before clicking "Go Live":
 ---
 
 **Developer**: Full Bloom Software
-**Contact**: mattlelonek@gmail.com
+**Contact**: matt@glassllama.co.uk
 **Repository**: https://github.com/matt99is/aircalc
