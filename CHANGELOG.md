@@ -9,8 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Updated contact email to matt@glassllama.co.uk
+- Switched to semantic versioning (MAJOR.MINOR.PATCH format)
+- Replaced company name from Full Bloom Software to GlassLlama
 
-## [1.6] - 2025-10-19
+### Removed
+- Removed redundant documentation files (PLAY_STORE_CHECKLIST.md, PRIVACY_POLICY.md, RELEASE_NOTES.md)
+
+## [1.6.0] - 2025-10-19
 
 ### Changed
 - **Major formula update for Frozen Foods**: Now uses same temperature (0°F reduction) with 50% time reduction for better results matching manufacturer guidelines
@@ -23,13 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed app state loss when returning from background during theme changes
 - Improved theme handling with proper configuration change management
 
-## [1.5] - 2025-10-18
+## [1.5.0] - 2025-10-18
 
 ### Fixed
 - Fixed build warnings and improved code quality
 - Cleaned up unnecessary files and improved directory structure
 
-## [1.4] - 2025-10-17
+## [1.4.0] - 2025-10-17
 
 ### Changed
 - Updated UI colors for better visual consistency
@@ -38,13 +43,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed status bar display issues
 
-## [1.3] - 2025-10-16
+## [1.3.0] - 2025-10-16
 
 ### Changed
 - Removed analytics mentions from privacy policy
 - Added HTML privacy policy for GitHub Pages hosting
 
-## [1.1] - 2025-10-15
+## [1.1.0] - 2025-10-15
 
 ### Added
 - Core conversion functionality for all major food categories (Frozen Foods, Fresh Vegetables, Raw Meats, Ready Meals)
@@ -66,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Material Design 3 theming
 - ProGuard/R8 optimization enabled
 
-## [1.0] - Initial Development
+## [1.0.0] - Initial Development
 
 ### Added
 - Initial project setup
@@ -76,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Google Play Release Notes
 
-### Version 1.6
+### Version 1.6.0
 ```
 • Updated conversion formulas based on industry research for more accurate results
 • Frozen foods now cook in half the time at the same temperature
@@ -84,19 +89,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 • Improved app stability when returning from background
 ```
 
-### Version 1.5
+### Version 1.5.0
 ```
 • Fixed build warnings and improved code quality
 • Performance improvements and cleanup
 ```
 
-### Version 1.4
+### Version 1.4.0
 ```
 • Updated UI colors for better visual experience
 • Fixed status bar display issues
 ```
 
-### Version 1.1
+### Version 1.1.0
 ```
 • Initial release of AirCalc
 • Convert oven recipes to air fryer settings instantly
@@ -108,10 +113,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[unreleased]: https://github.com/matt99is/aircalc/compare/v1.6...HEAD
-[1.6]: https://github.com/matt99is/aircalc/releases/tag/v1.6
-[1.5]: https://github.com/matt99is/aircalc/releases/tag/v1.5
-[1.4]: https://github.com/matt99is/aircalc/releases/tag/v1.4
-[1.3]: https://github.com/matt99is/aircalc/releases/tag/v1.3
-[1.1]: https://github.com/matt99is/aircalc/releases/tag/v1.1
-[1.0]: https://github.com/matt99is/aircalc/releases/tag/v1.0
+## Versioning Guide
+
+AirCalc follows [Semantic Versioning](https://semver.org/):
+- **MAJOR.MINOR.PATCH** (e.g., 1.6.0)
+- **MAJOR** (2.0.0) - Breaking changes, complete redesigns
+- **MINOR** (1.7.0) - New features, significant updates
+- **PATCH** (1.6.1) - Bug fixes, small improvements
+
+---
+
+[unreleased]: https://github.com/matt99is/aircalc/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/matt99is/aircalc/releases/tag/v1.6.0
+[1.5.0]: https://github.com/matt99is/aircalc/releases/tag/v1.5.0
+[1.4.0]: https://github.com/matt99is/aircalc/releases/tag/v1.4.0
+[1.3.0]: https://github.com/matt99is/aircalc/releases/tag/v1.3.0
+[1.1.0]: https://github.com/matt99is/aircalc/releases/tag/v1.1.0
+[1.0.0]: https://github.com/matt99is/aircalc/releases/tag/v1.0.0
