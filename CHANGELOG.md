@@ -15,6 +15,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed redundant documentation files (PLAY_STORE_CHECKLIST.md, PRIVACY_POLICY.md, RELEASE_NOTES.md)
 
+## [1.6.1] - 2025-10-24
+
+### Fixed
+- Fixed LRU cache implementation for better performance and proper eviction of least-recently-used items
+- Fixed TimerManager lifecycle to prevent potential memory leaks
+- Removed artificial 500ms delay in conversion operations for instant cached results
+
+### Changed
+- Refactored MainActivity to properly use ViewModel (MVVM architecture)
+- Extracted window theme management logic into dedicated WindowThemeManager class for better maintainability
+- Added @Immutable annotations to domain models for improved Compose performance
+- Improved code organization and separation of concerns
+
+### Removed
+- Removed legacy AirFryerConverter.kt (83 lines of dead code)
+- Removed legacy TimerManager.kt (68 lines of dead code)
+
+### Technical
+- MainActivity reduced from 1,663 to 1,615 lines (-3%)
+- Proper thread-safe LRU cache using LinkedHashMap with access-order
+- TimerManager lifecycle now tied to ViewModel scope instead of singleton
+- Created gradle.properties with proper AndroidX configuration
+- All conversions now properly validated through domain layer
+- Better Compose recomposition performance with immutable state
+
 ## [1.6.0] - 2025-10-19
 
 ### Changed
@@ -81,6 +106,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Google Play Release Notes
 
+### Version 1.6.1
+```
+• Performance improvements: Faster conversions with optimized caching
+• Fixed potential memory leaks for improved stability
+• Code quality improvements and bug fixes
+• Better app performance and responsiveness
+```
+
 ### Version 1.6.0
 ```
 • Updated conversion formulas based on industry research for more accurate results
@@ -123,7 +156,8 @@ AirCalc follows [Semantic Versioning](https://semver.org/):
 
 ---
 
-[unreleased]: https://github.com/matt99is/aircalc/compare/v1.6.0...HEAD
+[unreleased]: https://github.com/matt99is/aircalc/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/matt99is/aircalc/releases/tag/v1.6.1
 [1.6.0]: https://github.com/matt99is/aircalc/releases/tag/v1.6.0
 [1.5.0]: https://github.com/matt99is/aircalc/releases/tag/v1.5.0
 [1.4.0]: https://github.com/matt99is/aircalc/releases/tag/v1.4.0

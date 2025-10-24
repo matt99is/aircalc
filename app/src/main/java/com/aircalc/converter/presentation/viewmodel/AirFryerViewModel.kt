@@ -187,7 +187,7 @@ class AirFryerViewModel @Inject constructor(
      * Timer management functions.
      */
     fun startTimer(minutes: Int) {
-        timerManager.startTimer(minutes)
+        timerManager.startTimer(viewModelScope, minutes)
         announceToAccessibility("Timer started for $minutes minutes")
     }
 

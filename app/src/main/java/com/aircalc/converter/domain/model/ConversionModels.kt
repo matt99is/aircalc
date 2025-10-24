@@ -1,5 +1,7 @@
 package com.aircalc.converter.domain.model
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Domain models for conversion operations.
  * These models contain no UI or framework dependencies.
@@ -9,6 +11,7 @@ package com.aircalc.converter.domain.model
  * Input parameters for air fryer conversion.
  * Validation is handled by ConversionValidator, not in the data class itself.
  */
+@Immutable
 data class ConversionInput(
     val ovenTemperature: Int,
     val cookingTimeMinutes: Int,
@@ -19,6 +22,7 @@ data class ConversionInput(
 /**
  * Result of air fryer conversion with all calculated values.
  */
+@Immutable
 data class ConversionResult(
     val originalTemperature: Int,
     val originalTime: Int,

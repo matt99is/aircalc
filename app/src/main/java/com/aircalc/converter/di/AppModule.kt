@@ -58,7 +58,6 @@ object AppModule {
     }
 
     @Provides
-    @Singleton
     fun provideTimerManager(): TimerManager {
         return TimerManager()
     }

@@ -5,25 +5,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Manages timer functionality with proper lifecycle handling.
  * Separated from ViewModel for reusability and testability.
+ *
+ * Note: No longer a Singleton - lifecycle tied to ViewModel scope
  */
-@Singleton
 class TimerManager @Inject constructor() {
 
     private val _timerState = MutableStateFlow(TimerState())
     val timerState: StateFlow<TimerState> = _timerState.asStateFlow()
 
     private var timerJob: Job? = null
-    private val timerScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     /**
      * Start timer with specified duration in minutes.
+     * Uses the provided coroutine scope (typically viewModelScope).
      */
-    fun startTimer(minutes: Int) {
+    fun startTimer(scope: CoroutineScope, minutes: Int) {
         stopTimer() // Stop any existing timer
 
         val totalSeconds = minutes * 60
@@ -35,7 +35,7 @@ class TimerManager @Inject constructor() {
             formattedTime = formatTime(totalSeconds)
         )
 
-        timerJob = timerScope.launch {
+        timerJob = scope.launch(Dispatchers.Default) {
             var remaining = totalSeconds
 
             while (remaining > 0 && _timerState.value.isRunning) {
@@ -109,10 +109,11 @@ class TimerManager @Inject constructor() {
 
     /**
      * Cleanup resources.
+     * Note: CoroutineScope is managed by caller (typically ViewModel),
+     * so we only cancel the timer job here.
      */
     fun cleanup() {
         stopTimer()
-        timerScope.cancel()
     }
 }
 

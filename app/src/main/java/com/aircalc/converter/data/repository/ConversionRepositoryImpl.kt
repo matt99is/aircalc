@@ -3,7 +3,6 @@ package com.aircalc.converter.data.repository
 import com.aircalc.converter.data.datasource.ConversionDataSource
 import com.aircalc.converter.domain.model.*
 import com.aircalc.converter.domain.repository.ConversionRepository
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,9 +30,6 @@ class ConversionRepositoryImpl @Inject constructor(
             if (cachedResult != null) {
                 return Result.success(cachedResult)
             }
-
-            // Simulate processing delay for realistic UX
-            delay(500)
 
             // Perform conversion calculation
             val result = dataSource.performConversion(input)
@@ -103,27 +99,35 @@ class ConversionRepositoryImpl @Inject constructor(
 }
 
 /**
- * Simple in-memory cache for conversion results.
+ * True LRU cache for conversion results using LinkedHashMap with access-order.
  */
 @Singleton
 class ConversionCache @Inject constructor() {
-    private val cache = mutableMapOf<String, ConversionResult>()
     private val maxSize = 50
 
+    private val cache = object : LinkedHashMap<String, ConversionResult>(
+        16,
+        0.75f,
+        true  // access-order mode for proper LRU behavior
+    ) {
+        override fun removeEldestEntry(eldest: Map.Entry<String, ConversionResult>): Boolean {
+            return size > maxSize
+        }
+    }
+
+    @Synchronized
     fun get(key: String): ConversionResult? = cache[key]
 
+    @Synchronized
     fun put(key: String, result: ConversionResult) {
-        if (cache.size >= maxSize) {
-            // Remove oldest entry (simple LRU approximation)
-            val oldestKey = cache.keys.first()
-            cache.remove(oldestKey)
-        }
         cache[key] = result
     }
 
+    @Synchronized
     fun clear() {
         cache.clear()
     }
 
+    @Synchronized
     fun size(): Int = cache.size
 }

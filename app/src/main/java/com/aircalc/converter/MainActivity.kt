@@ -9,11 +9,8 @@ import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.activity.SystemBarStyle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -80,14 +77,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aircalc.converter.presentation.screen.ConversionResultsScreen
+import com.aircalc.converter.presentation.viewmodel.AirFryerViewModel
 import com.aircalc.converter.ui.theme.AirCalcTheme
 import com.aircalc.converter.ui.theme.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen for Android 12+
@@ -96,7 +97,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Apply theme-specific window configuration
-        applyWindowTheme()
+        WindowThemeManager.applyTheme(this)
 
         setContent {
             AirCalcTheme {
@@ -114,77 +115,21 @@ class MainActivity : ComponentActivity() {
         super.onConfigurationChanged(newConfig)
 
         // Re-apply window theme when configuration changes (e.g., dark/light mode switch)
-        applyWindowTheme()
-    }
-
-    /**
-     * Apply window configuration based on current theme.
-     * Called both on initial creation and when theme changes.
-     */
-    private fun applyWindowTheme() {
-        val isDarkMode = (resources.configuration.uiMode and
-            android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-            android.content.res.Configuration.UI_MODE_NIGHT_YES
-
-        // 1. Set FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS explicitly
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-
-        if (isDarkMode) {
-            // 2. Use modern API with explicit dark scrim
-            enableEdgeToEdge(
-                statusBarStyle = SystemBarStyle.dark(
-                    scrim = android.graphics.Color.BLACK
-                ),
-                navigationBarStyle = SystemBarStyle.dark(
-                    scrim = android.graphics.Color.BLACK
-                )
-            )
-
-            // 3. HONOR/MagicOS workaround: Force-set colors for devices that don't respect enableEdgeToEdge
-            @Suppress("DEPRECATION")
-            window.statusBarColor = android.graphics.Color.BLACK
-            @Suppress("DEPRECATION")
-            window.navigationBarColor = android.graphics.Color.BLACK
-
-            // 4. Post to decorView to apply after view initialization
-            window.decorView.post {
-                @Suppress("DEPRECATION")
-                window.statusBarColor = android.graphics.Color.BLACK
-                @Suppress("DEPRECATION")
-                window.navigationBarColor = android.graphics.Color.BLACK
-
-                androidx.core.view.WindowCompat.getInsetsController(window, window.decorView).apply {
-                    isAppearanceLightStatusBars = false
-                    isAppearanceLightNavigationBars = false
-                }
-            }
-        } else {
-            // Light mode
-            enableEdgeToEdge(
-                statusBarStyle = SystemBarStyle.light(
-                    scrim = android.graphics.Color.TRANSPARENT,
-                    darkScrim = android.graphics.Color.TRANSPARENT
-                ),
-                navigationBarStyle = SystemBarStyle.light(
-                    scrim = android.graphics.Color.TRANSPARENT,
-                    darkScrim = android.graphics.Color.TRANSPARENT
-                )
-            )
-        }
+        WindowThemeManager.applyTheme(this)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AirFryerConverterApp() {
+fun AirFryerConverterApp(
+    viewModel: AirFryerViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
-    var ovenTemp by remember { mutableStateOf(180) }
-    var cookingTime by remember { mutableStateOf(25) }
-    var selectedCategory by remember { mutableStateOf(FoodCategory.REFRIGERATED_READY_MEALS) }
-    var temperatureUnit by remember { mutableStateOf(TemperatureUnit.CELSIUS) }
-    var conversionResult by remember { mutableStateOf<com.aircalc.converter.domain.model.ConversionResult?>(null) }
-    var isConverting by remember { mutableStateOf(false) }
-    val timerState = rememberTimerState()
+    val uiState by viewModel.uiState.collectAsState()
+    val timerState by viewModel.timerState.collectAsState()
+
+    // Legacy timer state for UI compatibility
+    val legacyTimerState = rememberTimerState()
 
     val context = LocalContext.current
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
@@ -192,7 +137,7 @@ fun AirFryerConverterApp() {
 
     // Set up timer finished callback to play alarm and vibrate
     LaunchedEffect(Unit) {
-        timerState.onTimerFinished = {
+        legacyTimerState.onTimerFinished = {
             scope.launch {
                 try {
                     // Vibrate
@@ -274,49 +219,88 @@ fun AirFryerConverterApp() {
         }
     }
 
-    LaunchedTimer(timerState)
+    LaunchedTimer(legacyTimerState)
 
     NavHost(
         navController = navController,
         startDestination = "input"
     ) {
         composable("input") {
+            // Map domain FoodCategory to UI FoodCategory for backward compatibility
+            val uiFoodCategory = uiState.selectedCategory?.let { domainCat ->
+                when (domainCat.id) {
+                    "frozen_foods" -> FoodCategory.FROZEN_FOODS
+                    "fresh_vegetables" -> FoodCategory.FRESH_VEGETABLES
+                    "raw_meats" -> FoodCategory.MEATS_RAW
+                    "ready_meals" -> FoodCategory.REFRIGERATED_READY_MEALS
+                    else -> FoodCategory.REFRIGERATED_READY_MEALS
+                }
+            } ?: FoodCategory.REFRIGERATED_READY_MEALS
+
+            val uiTempUnit = when (uiState.temperatureUnit) {
+                com.aircalc.converter.domain.model.TemperatureUnit.FAHRENHEIT -> TemperatureUnit.FAHRENHEIT
+                com.aircalc.converter.domain.model.TemperatureUnit.CELSIUS -> TemperatureUnit.CELSIUS
+            }
+
             ConversionInputScreen(
-                ovenTemp = ovenTemp,
-                cookingTime = cookingTime,
-                selectedCategory = selectedCategory,
-                temperatureUnit = temperatureUnit,
-                isConverting = isConverting,
-                onTemperatureChange = { ovenTemp = it },
-                onTimeChange = { cookingTime = it },
-                onCategoryChange = { selectedCategory = it },
-                onTemperatureUnitChange = { temperatureUnit = it },
-                onConvert = { result ->
-                    conversionResult = result
-                    isConverting = false
-                    navController.navigate("results")
+                ovenTemp = uiState.ovenTemperature,
+                cookingTime = uiState.cookingTime,
+                selectedCategory = uiFoodCategory,
+                temperatureUnit = uiTempUnit,
+                isConverting = uiState.isConverting,
+                onTemperatureChange = { viewModel.updateTemperature(it) },
+                onTimeChange = { viewModel.updateCookingTime(it) },
+                onCategoryChange = { uiCat ->
+                    // Map UI FoodCategory to domain FoodCategory
+                    val domainCat = when (uiCat) {
+                        FoodCategory.FROZEN_FOODS -> com.aircalc.converter.domain.model.FoodCategory.FROZEN_FOODS
+                        FoodCategory.FRESH_VEGETABLES -> com.aircalc.converter.domain.model.FoodCategory.FRESH_VEGETABLES
+                        FoodCategory.MEATS_RAW -> com.aircalc.converter.domain.model.FoodCategory.RAW_MEATS
+                        FoodCategory.REFRIGERATED_READY_MEALS -> com.aircalc.converter.domain.model.FoodCategory.READY_MEALS
+                    }
+                    viewModel.updateSelectedCategory(domainCat)
                 },
-                onConvertingStateChange = { isConverting = it }
+                onTemperatureUnitChange = { uiUnit ->
+                    val domainUnit = when (uiUnit) {
+                        TemperatureUnit.FAHRENHEIT -> com.aircalc.converter.domain.model.TemperatureUnit.FAHRENHEIT
+                        TemperatureUnit.CELSIUS -> com.aircalc.converter.domain.model.TemperatureUnit.CELSIUS
+                    }
+                    viewModel.updateTemperatureUnit(domainUnit)
+                },
+                onConvert = { _ ->
+                    viewModel.convertToAirFryer()
+                },
+                onConvertingStateChange = { /* ViewModel handles this */ }
             )
+
+            // Navigate when conversion completes
+            LaunchedEffect(uiState.conversionResult) {
+                if (uiState.conversionResult != null && !uiState.isConverting) {
+                    navController.navigate("results")
+                }
+            }
         }
 
         composable("results") {
-            conversionResult?.let { result ->
+            uiState.conversionResult?.let { result ->
                 // Initialize timer with cooking time when screen loads
                 LaunchedEffect(result.airFryerTimeMinutes) {
-                    timerState.resetTimer(result.airFryerTimeMinutes)
+                    legacyTimerState.resetTimer(result.airFryerTimeMinutes)
                 }
 
                 ConversionResultsScreen(
                     conversionResult = result,
-                    timerState = timerState,
+                    timerState = legacyTimerState,
                     onStartTimer = {
-                        timerState.startTimer()
+                        legacyTimerState.startTimer()
                     },
-                    onPauseTimer = { timerState.pauseTimer() },
-                    onResumeTimer = { timerState.startTimer() },
-                    onResetTimer = { timerState.resetTimer(result.airFryerTimeMinutes) },
-                    onNavigateBack = { navController.popBackStack() }
+                    onPauseTimer = { legacyTimerState.pauseTimer() },
+                    onResumeTimer = { legacyTimerState.startTimer() },
+                    onResetTimer = { legacyTimerState.resetTimer(result.airFryerTimeMinutes) },
+                    onNavigateBack = {
+                        viewModel.clearResult()
+                        navController.popBackStack()
+                    }
                 )
             }
         }
@@ -335,7 +319,7 @@ fun ConversionInputScreen(
     onTimeChange: (Int) -> Unit,
     onCategoryChange: (FoodCategory) -> Unit,
     onTemperatureUnitChange: (TemperatureUnit) -> Unit,
-    onConvert: (com.aircalc.converter.domain.model.ConversionResult) -> Unit,
+    onConvert: (com.aircalc.converter.domain.model.ConversionResult?) -> Unit,
     onConvertingStateChange: (Boolean) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
@@ -451,39 +435,8 @@ fun ConversionInputScreen(
                     // Clear focus to exit any editing mode
                     focusManager.clearFocus()
 
-                    onConvertingStateChange(true)
-                    // Convert UI types to domain types for conversion
-                    val domainTempUnit = when (temperatureUnit) {
-                        TemperatureUnit.FAHRENHEIT -> com.aircalc.converter.domain.model.TemperatureUnit.FAHRENHEIT
-                        TemperatureUnit.CELSIUS -> com.aircalc.converter.domain.model.TemperatureUnit.CELSIUS
-                    }
-                    val domainCategory = when (selectedCategory) {
-                        FoodCategory.FROZEN_FOODS -> com.aircalc.converter.domain.model.FoodCategory.FROZEN_FOODS
-                        FoodCategory.FRESH_VEGETABLES -> com.aircalc.converter.domain.model.FoodCategory.FRESH_VEGETABLES
-                        FoodCategory.MEATS_RAW -> com.aircalc.converter.domain.model.FoodCategory.RAW_MEATS
-                        FoodCategory.REFRIGERATED_READY_MEALS -> com.aircalc.converter.domain.model.FoodCategory.READY_MEALS
-                    }
-
-                    // Calculate actual temperature reduction based on unit
-                    val tempReduction = domainTempUnit.convertTempReduction(
-                        domainCategory.tempReductionFahrenheit
-                    )
-                    val airFryerTemp = ovenTemp - tempReduction
-                    val airFryerTime = (cookingTime * domainCategory.timeMultiplier).toInt()
-
-                    // Create conversion result with domain types
-                    val result = com.aircalc.converter.domain.model.ConversionResult(
-                        originalTemperature = ovenTemp,
-                        originalTime = cookingTime,
-                        airFryerTemperature = airFryerTemp,
-                        airFryerTimeMinutes = airFryerTime,
-                        temperatureUnit = domainTempUnit,
-                        foodCategory = domainCategory,
-                        cookingTip = domainCategory.cookingTip,
-                        temperatureReduction = tempReduction,
-                        timeReduction = cookingTime - airFryerTime
-                    )
-                    onConvert(result)
+                    // Trigger conversion via callback (ViewModel handles actual conversion)
+                    onConvert(null)
                 }
             )
 
