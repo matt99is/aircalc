@@ -128,99 +128,6 @@ fun AirFryerConverterApp(
     val uiState by viewModel.uiState.collectAsState()
     val timerState by viewModel.timerState.collectAsState()
 
-    // Legacy timer state for UI compatibility
-    val legacyTimerState = rememberTimerState()
-
-    val context = LocalContext.current
-    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
-    val scope = rememberCoroutineScope()
-
-    // Set up timer finished callback to play alarm and vibrate
-    LaunchedEffect(Unit) {
-        legacyTimerState.onTimerFinished = {
-            scope.launch {
-                try {
-                    // Vibrate
-                    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-                        vibratorManager.defaultVibrator
-                    } else {
-                        @Suppress("DEPRECATION")
-                        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                    }
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        // Pattern: vibrate for 500ms, pause 200ms, vibrate 500ms, pause 200ms, vibrate 500ms
-                        val pattern = longArrayOf(0, 500, 200, 500, 200, 500)
-                        val amplitudes = intArrayOf(0, 255, 0, 255, 0, 255)
-                        vibrator.vibrate(VibrationEffect.createWaveform(pattern, amplitudes, -1))
-                    } else {
-                        @Suppress("DEPRECATION")
-                        vibrator.vibrate(longArrayOf(0, 500, 200, 500, 200, 500), -1)
-                    }
-
-                    // Play alarm sound using MediaPlayer for better volume control
-                    try {
-                        mediaPlayer?.release() // Release any existing player
-                        mediaPlayer = MediaPlayer().apply {
-                            // Use default alarm sound
-                            setDataSource(context, android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI)
-
-                            // Set audio attributes to use alarm stream
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                setAudioAttributes(
-                                    AudioAttributes.Builder()
-                                        .setUsage(AudioAttributes.USAGE_ALARM)
-                                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                                        .build()
-                                )
-                            } else {
-                                @Suppress("DEPRECATION")
-                                setAudioStreamType(AudioManager.STREAM_ALARM)
-                            }
-
-                            // Set volume to maximum
-                            setVolume(1.0f, 1.0f)
-
-                            // Prepare and play
-                            prepare()
-                            start()
-
-                            // Set completion listener to release resources
-                            setOnCompletionListener { mp ->
-                                mp.release()
-                            }
-                        }
-
-                        // Stop after 5 seconds if still playing
-                        kotlinx.coroutines.delay(5000)
-                        mediaPlayer?.let { mp ->
-                            if (mp.isPlaying) {
-                                mp.stop()
-                            }
-                            mp.release()
-                        }
-                        mediaPlayer = null
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        // Fallback: just continue without sound
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
-
-    // Clean up media player when app is disposed
-    DisposableEffect(Unit) {
-        onDispose {
-            mediaPlayer?.release()
-        }
-    }
-
-    LaunchedTimer(legacyTimerState)
-
     NavHost(
         navController = navController,
         startDestination = "input"
@@ -285,18 +192,55 @@ fun AirFryerConverterApp(
             uiState.conversionResult?.let { result ->
                 // Initialize timer with cooking time when screen loads
                 LaunchedEffect(result.airFryerTimeMinutes) {
-                    legacyTimerState.resetTimer(result.airFryerTimeMinutes)
+                    // Always initialize the timer when entering results screen
+                    // This sets up the timer with the correct duration but doesn't start it
+                    if (!timerState.isStarted || timerState.isFinished) {
+                        viewModel.startTimer(result.airFryerTimeMinutes)
+                        viewModel.pauseTimer()
+                    }
+                }
+
+                // Convert ViewModel timer state to legacy UI timer state format
+                val legacyTimerState = remember(timerState) {
+                    object : TimerState(result.airFryerTimeMinutes) {
+                        override val timeLeftSeconds: Int get() = timerState.remainingSeconds
+                        override val isRunning: Boolean get() = timerState.isRunning
+                        override val isFinished: Boolean get() = timerState.isFinished
+                        override val timeLeftFormatted: String get() = timerState.formattedTime
+
+                        override fun startTimer() {
+                            viewModel.startTimer(result.airFryerTimeMinutes)
+                        }
+
+                        override fun pauseTimer() {
+                            viewModel.pauseTimer()
+                        }
+
+                        override fun resetTimer(minutes: Int) {
+                            viewModel.resetTimer()
+                        }
+                    }
                 }
 
                 ConversionResultsScreen(
                     conversionResult = result,
                     timerState = legacyTimerState,
                     onStartTimer = {
-                        legacyTimerState.startTimer()
+                        // Only start if not already started, otherwise resume
+                        if (!timerState.isStarted) {
+                            viewModel.startTimer(result.airFryerTimeMinutes)
+                        } else {
+                            viewModel.resumeTimer()
+                        }
                     },
-                    onPauseTimer = { legacyTimerState.pauseTimer() },
-                    onResumeTimer = { legacyTimerState.startTimer() },
-                    onResetTimer = { legacyTimerState.resetTimer(result.airFryerTimeMinutes) },
+                    onPauseTimer = { viewModel.pauseTimer() },
+                    onResumeTimer = { viewModel.resumeTimer() },
+                    onResetTimer = {
+                        viewModel.resetTimer()
+                        // Re-initialize the timer with the cooking time after reset
+                        viewModel.startTimer(result.airFryerTimeMinutes)
+                        viewModel.pauseTimer()
+                    },
                     onNavigateBack = {
                         viewModel.clearResult()
                         navController.popBackStack()

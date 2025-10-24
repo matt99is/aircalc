@@ -38,7 +38,7 @@
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.AirCalc.SplashScreen"
-            android:configChanges="uiMode">
+            android:configChanges="orientation|screenSize|uiMode|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

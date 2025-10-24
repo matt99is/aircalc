@@ -12,10 +12,10 @@ import com.aircalc.converter.domain.model.TemperatureUnit
 @Stable
 data class AirFryerUiState(
     // Input state
-    val ovenTemperature: Int = 350,
+    val ovenTemperature: Int = 180,
     val cookingTime: Int = 25,
     val selectedCategory: FoodCategory? = FoodCategory.READY_MEALS,
-    val temperatureUnit: TemperatureUnit = TemperatureUnit.FAHRENHEIT,
+    val temperatureUnit: TemperatureUnit = TemperatureUnit.CELSIUS,
 
     // Conversion state
     val isConverting: Boolean = false,

@@ -38,9 +38,10 @@ class TimerManager @Inject constructor() {
         timerJob = scope.launch(Dispatchers.Default) {
             var remaining = totalSeconds
 
-            while (remaining > 0 && _timerState.value.isRunning) {
+            while (remaining > 0 && _timerState.value.isStarted && !_timerState.value.isFinished) {
                 delay(1000) // Wait 1 second
 
+                // Only tick if running, but keep the loop alive even when paused
                 if (_timerState.value.isRunning) {
                     remaining--
                     val mins = remaining / 60
@@ -52,16 +53,16 @@ class TimerManager @Inject constructor() {
                         remainingMinutes = mins,
                         formattedTime = formatTime(remaining)
                     )
-                }
-            }
 
-            // Timer finished
-            if (remaining <= 0) {
-                _timerState.value = _timerState.value.copy(
-                    isFinished = true,
-                    isRunning = false,
-                    formattedTime = "00:00"
-                )
+                    // Timer finished
+                    if (remaining <= 0) {
+                        _timerState.value = _timerState.value.copy(
+                            isFinished = true,
+                            isRunning = false,
+                            formattedTime = "00:00"
+                        )
+                    }
+                }
             }
         }
     }

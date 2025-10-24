@@ -1,5 +1,6 @@
 package com.aircalc.converter.presentation.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -77,6 +78,9 @@ fun ConversionResultsScreen(
     modifier: Modifier = Modifier,
     showHeader: Boolean = false // Feature flag for header
 ) {
+    // Handle system back button press
+    BackHandler(onBack = onNavigateBack)
+
     Column(
         modifier = modifier
             .fillMaxSize()

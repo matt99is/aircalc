@@ -7,13 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2025-10-24
+
+### Fixed
+- **CRITICAL: Fixed timer state loss on screen rotation** - Timer now properly survives device rotation and configuration changes
+- **CRITICAL: Fixed MediaPlayer memory leak on rotation** - MediaPlayer now managed in ViewModel to prevent leaks across configuration changes
+- Fixed timer pause/resume functionality - Timer now properly pauses and resumes without resetting
+- Fixed timer reset behavior - Reset now reinitializes timer with cooking time instead of showing 00:00
+- Fixed timer start button - Now resumes paused timer instead of restarting from beginning
+- Fixed system back button navigation from timer screen to main screen
+
 ### Changed
+- **App now defaults to Celsius (°C)** with 180°C default temperature for better international UX
+- Migrated timer management from MainActivity to ViewModel for proper lifecycle handling
+- Updated MainActivity to handle orientation and screen size changes without Activity recreation
+- Refactored timer state to use ViewModel's TimerManager instead of legacy Composable state
+- MediaPlayer now properly managed in AndroidViewModel with Application context
 - Updated contact email to matt@glassllama.co.uk
 - Switched to semantic versioning (MAJOR.MINOR.PATCH format)
 - Replaced company name from Full Bloom Software to GlassLlama
 
+### Technical
+- Added `orientation|screenSize|keyboardHidden` to AndroidManifest configChanges
+- ViewModel extends AndroidViewModel for safe MediaPlayer management
+- Timer state survives configuration changes via ViewModel scope
+- MediaPlayer properly released in onCleared() to prevent memory leaks
+- Timer coroutine job stays alive when paused to enable proper resume functionality
+- Added BackHandler to ConversionResultsScreen for proper back navigation
+- Converted legacy TimerState class to abstract adapter pattern
+
 ### Removed
 - Removed redundant documentation files (PLAY_STORE_CHECKLIST.md, PRIVACY_POLICY.md, RELEASE_NOTES.md)
+- Removed legacy timer implementation code from MainActivity (MediaPlayer, vibration, LaunchedEffect)
 
 ## [1.6.1] - 2025-10-24
 
@@ -106,6 +131,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Google Play Release Notes
 
+### Version 1.7.0
+```
+• MAJOR FIX: Timer now survives screen rotation without losing time
+• MAJOR FIX: Fixed memory leaks for much better stability
+• Fixed timer pause/resume - now works correctly without resetting
+• Fixed timer reset - now shows cooking time instead of 00:00
+• App now defaults to Celsius (°C) for better international support
+• Fixed back button navigation from timer screen
+• Improved app reliability and performance
+```
+
 ### Version 1.6.1
 ```
 • Performance improvements: Faster conversions with optimized caching
@@ -156,7 +192,8 @@ AirCalc follows [Semantic Versioning](https://semver.org/):
 
 ---
 
-[unreleased]: https://github.com/matt99is/aircalc/compare/v1.6.1...HEAD
+[unreleased]: https://github.com/matt99is/aircalc/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/matt99is/aircalc/releases/tag/v1.7.0
 [1.6.1]: https://github.com/matt99is/aircalc/releases/tag/v1.6.1
 [1.6.0]: https://github.com/matt99is/aircalc/releases/tag/v1.6.0
 [1.5.0]: https://github.com/matt99is/aircalc/releases/tag/v1.5.0
