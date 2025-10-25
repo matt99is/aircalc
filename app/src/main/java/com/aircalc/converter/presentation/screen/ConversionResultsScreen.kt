@@ -38,29 +38,7 @@ import com.aircalc.converter.domain.model.ConversionResult
 import com.aircalc.converter.domain.model.FoodCategory
 import com.aircalc.converter.domain.model.TemperatureUnit
 import com.aircalc.converter.TimerState
-
-@Composable
-fun BorderCard(
-    modifier: Modifier = Modifier,
-    backgroundColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surface,
-    borderColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.outline,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .background(
-                color = backgroundColor,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .border(
-                width = 1.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(12.dp)
-            )
-    ) {
-        content()
-    }
-}
+import com.aircalc.converter.presentation.components.BorderCard
 
 /**
  * Screen displaying conversion results with timer controls
@@ -167,6 +145,7 @@ fun ConversionResultsScreen(
             // Action Buttons
             TimerControlButtons(
                 timerState = timerState,
+                targetMinutes = conversionResult.airFryerTimeMinutes,
                 onStartTimer = onStartTimer,
                 onPauseTimer = onPauseTimer,
                 onResumeTimer = onResumeTimer,
@@ -343,6 +322,7 @@ private fun CircularTimerSection(
 @Composable
 private fun TimerControlButtons(
     timerState: TimerState,
+    targetMinutes: Int,
     onStartTimer: () -> Unit,
     onPauseTimer: () -> Unit,
     onResumeTimer: () -> Unit,
@@ -355,15 +335,15 @@ private fun TimerControlButtons(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Start/Pause/Resume Button
-        var isPendingAction by remember { mutableStateOf(false) }
+        // Determine button state based on timer
+        val targetSeconds = targetMinutes * 60
+        val isAtInitialTime = timerState.timeLeftSeconds == targetSeconds
 
-        if (!timerState.isRunning && timerState.timeLeftSeconds > 0) {
-            // Start Button - Green
+        // Start/Pause/Resume Button
+        if (!timerState.isRunning && isAtInitialTime) {
+            // Start Button - Green (initial state)
             Button(
-                onClick = {
-                    isPendingAction = true
-                },
+                onClick = onStartTimer,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -379,20 +359,10 @@ private fun TimerControlButtons(
                     fontWeight = FontWeight.Medium
                 )
             }
-
-            if (isPendingAction) {
-                LaunchedEffect(Unit) {
-                    kotlinx.coroutines.delay(150)
-                    onStartTimer()
-                    isPendingAction = false
-                }
-            }
         } else if (timerState.isRunning) {
-            // Stop Button - Green
+            // Pause Button - Green (timer running)
             Button(
-                onClick = {
-                    isPendingAction = true
-                },
+                onClick = onPauseTimer,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -403,21 +373,13 @@ private fun TimerControlButtons(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.stop),
+                    text = stringResource(R.string.pause),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
             }
-
-            if (isPendingAction) {
-                LaunchedEffect(Unit) {
-                    kotlinx.coroutines.delay(150)
-                    onPauseTimer()
-                    isPendingAction = false
-                }
-            }
         } else {
-            // Resume Button - Green
+            // Resume Button - Green (timer paused)
             Button(
                 onClick = onResumeTimer,
                 modifier = Modifier

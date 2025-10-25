@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.1] - 2025-10-25
+
+### Fixed
+- Fixed button lag on timer controls - removed unnecessary delays for instant response
+- Fixed button labels to properly show Start → Pause → Resume flow
+- Fixed notification appearing briefly when app is in foreground
+- Locked phone orientation to portrait for better UX (tablets can still rotate)
+
+### Changed
+- **Optimized notification updates** - Now updates only when minutes change instead of every second (60x reduction in battery usage)
+- **Simplified notification display** - Shows time in minutes only (e.g., "15 min") instead of MM:SS format
+- Optimized wake lock timeout to be dynamic based on timer duration + 5min buffer (previously fixed 1 hour)
+- Improved MediaPlayer with proper cancellation handling to prevent potential crashes
+- Removed emoji icons from timer control buttons for cleaner UI
+
+### Technical
+- Created Constants.kt for centralized configuration values
+- Added distinctUntilChanged() with ConversionInputKey to prevent unnecessary UI recompositions
+- Extracted BorderCard component to shared CommonComponents.kt to eliminate code duplication
+- Improved notification service lifecycle management
+- Better coroutine cancellation handling in timer service
+
 ## [1.7.0] - 2025-10-24
 
 ### Fixed
@@ -131,6 +153,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Google Play Release Notes
 
+### Version 1.7.1
+```
+• Massive battery optimization: Notifications now update 60x less frequently
+• Fixed timer button lag for instant response
+• Fixed button labels: Start → Pause → Resume flow
+• Locked phone orientation to portrait (tablets can still rotate)
+• Cleaner UI: Removed emoji icons from buttons
+• Notification now shows time in minutes only
+• Performance improvements and bug fixes
+```
+
 ### Version 1.7.0
 ```
 • MAJOR FIX: Timer now survives screen rotation without losing time
@@ -192,7 +225,8 @@ AirCalc follows [Semantic Versioning](https://semver.org/):
 
 ---
 
-[unreleased]: https://github.com/matt99is/aircalc/compare/v1.7.0...HEAD
+[unreleased]: https://github.com/matt99is/aircalc/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/matt99is/aircalc/releases/tag/v1.7.1
 [1.7.0]: https://github.com/matt99is/aircalc/releases/tag/v1.7.0
 [1.6.1]: https://github.com/matt99is/aircalc/releases/tag/v1.6.1
 [1.6.0]: https://github.com/matt99is/aircalc/releases/tag/v1.6.0

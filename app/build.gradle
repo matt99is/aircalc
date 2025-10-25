@@ -13,8 +13,8 @@ android {
         applicationId "com.aircalc.converter"
         minSdk 24
         targetSdk 35
-        versionCode 9
-        versionName "1.7.0"
+        versionCode 10
+        versionName "1.7.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -90,6 +90,9 @@ dependencies {
 
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+    // DataStore for timer state persistence
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
 
     // Unit Testing
     testImplementation 'junit:junit:4.13.2'

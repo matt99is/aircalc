@@ -1,59 +1,35 @@
 package com.aircalc.converter.presentation.viewmodel
 
 import android.app.Application
-import android.content.Context
-import android.media.AudioAttributes
-import android.media.AudioManager
-import android.media.MediaPlayer
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.aircalc.converter.domain.model.*
 import com.aircalc.converter.domain.usecase.ConvertToAirFryerUseCase
 import com.aircalc.converter.domain.usecase.ConversionEstimate
 import com.aircalc.converter.presentation.state.AirFryerUiState
-import com.aircalc.converter.presentation.timer.TimerManager
+import com.aircalc.converter.presentation.service.TimerService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
  * ViewModel for the Air Fryer app.
  * Manages UI state and coordinates between UI and domain layer.
- * Extends AndroidViewModel to safely manage MediaPlayer across configuration changes.
+ * Uses TimerService for background timer functionality.
  */
 @HiltViewModel
 class AirFryerViewModel @Inject constructor(
     application: Application,
-    private val convertToAirFryerUseCase: ConvertToAirFryerUseCase,
-    private val timerManager: TimerManager
+    private val convertToAirFryerUseCase: ConvertToAirFryerUseCase
 ) : AndroidViewModel(application) {
-
-    private var mediaPlayer: MediaPlayer? = null
 
     private val _uiState = MutableStateFlow(AirFryerUiState())
     val uiState: StateFlow<AirFryerUiState> = _uiState.asStateFlow()
 
-    // Timer state from TimerManager
-    val timerState = timerManager.timerState
-
-    init {
-        // Observe timer state changes to trigger alarm when finished
-        viewModelScope.launch {
-            timerState.collect { state ->
-                if (state.isFinished && state.remainingSeconds == 0) {
-                    playTimerAlarm()
-                }
-            }
-        }
-    }
+    // Timer state from TimerService (static)
+    // No need to collect here - state is already exposed as StateFlow
+    val timerState = TimerService.timerState
 
     // Derived states for UI optimization
     val canConvert: StateFlow<Boolean> = _uiState.map { state ->
@@ -72,29 +48,52 @@ class AirFryerViewModel @Inject constructor(
         }
     )
 
-    val conversionEstimate: StateFlow<ConversionEstimate?> = _uiState.map { state ->
-        if (state.selectedCategory != null && state.ovenTemperature > 0 && state.cookingTime > 0) {
-            convertToAirFryerUseCase.getQuickEstimate(
+    val conversionEstimate: StateFlow<ConversionEstimate?> = _uiState
+        .map { state ->
+            // Create a key from only the relevant fields for conversion
+            ConversionInputKey(
                 temperature = state.ovenTemperature,
                 time = state.cookingTime,
                 category = state.selectedCategory,
                 unit = state.temperatureUnit
             )
-        } else null
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = AirFryerUiState().let { state ->
-            val category = state.selectedCategory
-            if (category != null && state.ovenTemperature > 0 && state.cookingTime > 0) {
+        }
+        .distinctUntilChanged() // Only recalculate when these specific fields change
+        .map { key ->
+            if (key.category != null && key.temperature > 0 && key.time > 0) {
                 convertToAirFryerUseCase.getQuickEstimate(
-                    temperature = state.ovenTemperature,
-                    time = state.cookingTime,
-                    category = category,
-                    unit = state.temperatureUnit
+                    temperature = key.temperature,
+                    time = key.time,
+                    category = key.category,
+                    unit = key.unit
                 )
             } else null
         }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = AirFryerUiState().let { state ->
+                val category = state.selectedCategory
+                if (category != null && state.ovenTemperature > 0 && state.cookingTime > 0) {
+                    convertToAirFryerUseCase.getQuickEstimate(
+                        temperature = state.ovenTemperature,
+                        time = state.cookingTime,
+                        category = category,
+                        unit = state.temperatureUnit
+                    )
+                } else null
+            }
+        )
+
+    /**
+     * Data class representing the inputs needed for conversion estimation.
+     * Used to filter unnecessary recalculations when other state fields change.
+     */
+    private data class ConversionInputKey(
+        val temperature: Int,
+        val time: Int,
+        val category: FoodCategory?,
+        val unit: TemperatureUnit
     )
 
     /**
@@ -200,7 +199,7 @@ class AirFryerViewModel @Inject constructor(
             conversionResult = null,
             errorMessage = null
         )
-        timerManager.resetTimer()
+        TimerService.stop(getApplication())
     }
 
     /**
@@ -211,25 +210,25 @@ class AirFryerViewModel @Inject constructor(
     }
 
     /**
-     * Timer management functions.
+     * Timer management functions using background service.
      */
     fun startTimer(minutes: Int) {
-        timerManager.startTimer(viewModelScope, minutes)
+        TimerService.start(getApplication(), minutes)
         announceToAccessibility("Timer started for $minutes minutes")
     }
 
     fun pauseTimer() {
-        timerManager.pauseTimer()
+        TimerService.pause(getApplication())
         announceToAccessibility("Timer paused")
     }
 
     fun resumeTimer() {
-        timerManager.resumeTimer()
+        TimerService.resume(getApplication())
         announceToAccessibility("Timer resumed")
     }
 
     fun resetTimer() {
-        timerManager.resetTimer()
+        TimerService.stop(getApplication())
         announceToAccessibility("Timer reset")
     }
 
@@ -257,99 +256,8 @@ class AirFryerViewModel @Inject constructor(
         announceToAccessibility("Error: $message")
     }
 
-    /**
-     * Play alarm sound and vibrate when timer finishes.
-     * Manages MediaPlayer lifecycle to prevent memory leaks across configuration changes.
-     */
-    private fun playTimerAlarm() {
-        viewModelScope.launch {
-            try {
-                val context = getApplication<Application>().applicationContext
-
-                // Vibrate
-                val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-                    vibratorManager.defaultVibrator
-                } else {
-                    @Suppress("DEPRECATION")
-                    context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    // Pattern: vibrate for 500ms, pause 200ms, vibrate 500ms, pause 200ms, vibrate 500ms
-                    val pattern = longArrayOf(0, 500, 200, 500, 200, 500)
-                    val amplitudes = intArrayOf(0, 255, 0, 255, 0, 255)
-                    vibrator.vibrate(VibrationEffect.createWaveform(pattern, amplitudes, -1))
-                } else {
-                    @Suppress("DEPRECATION")
-                    vibrator.vibrate(longArrayOf(0, 500, 200, 500, 200, 500), -1)
-                }
-
-                // Play alarm sound using MediaPlayer
-                withContext(Dispatchers.Main) {
-                    try {
-                        // Release any existing player to prevent memory leaks
-                        mediaPlayer?.release()
-                        mediaPlayer = MediaPlayer().apply {
-                            // Use default alarm sound
-                            setDataSource(context, android.provider.Settings.System.DEFAULT_ALARM_ALERT_URI)
-
-                            // Set audio attributes to use alarm stream
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                setAudioAttributes(
-                                    AudioAttributes.Builder()
-                                        .setUsage(AudioAttributes.USAGE_ALARM)
-                                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                                        .build()
-                                )
-                            } else {
-                                @Suppress("DEPRECATION")
-                                setAudioStreamType(AudioManager.STREAM_ALARM)
-                            }
-
-                            // Set volume to maximum
-                            setVolume(1.0f, 1.0f)
-
-                            // Prepare and play
-                            prepare()
-                            start()
-
-                            // Set completion listener to release resources
-                            setOnCompletionListener { mp ->
-                                mp.release()
-                                mediaPlayer = null
-                            }
-                        }
-
-                        // Stop after 5 seconds if still playing
-                        delay(5000)
-                        mediaPlayer?.let { mp ->
-                            if (mp.isPlaying) {
-                                mp.stop()
-                            }
-                            mp.release()
-                            mediaPlayer = null
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        // Cleanup on error
-                        mediaPlayer?.release()
-                        mediaPlayer = null
-                    }
-                }
-
-                announceToAccessibility("Timer finished! Your food is ready.")
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
     override fun onCleared() {
         super.onCleared()
-        // Clean up MediaPlayer to prevent memory leaks
-        mediaPlayer?.release()
-        mediaPlayer = null
-        timerManager.cleanup()
+        // Timer is managed by service, no cleanup needed
     }
 }

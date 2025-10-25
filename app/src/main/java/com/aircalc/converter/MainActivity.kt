@@ -1,6 +1,7 @@
 package com.aircalc.converter
 
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.media.MediaPlayer
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -84,6 +85,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aircalc.converter.presentation.screen.ConversionResultsScreen
 import com.aircalc.converter.presentation.viewmodel.AirFryerViewModel
+import com.aircalc.converter.presentation.components.BorderCard
 import com.aircalc.converter.ui.theme.AirCalcTheme
 import com.aircalc.converter.ui.theme.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -95,6 +97,15 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
 
         super.onCreate(savedInstanceState)
+
+        // Lock orientation to portrait on phones, allow rotation on tablets
+        val screenLayout = resources.configuration.screenLayout
+        val screenSize = screenLayout and android.content.res.Configuration.SCREENLAYOUT_SIZE_MASK
+        if (screenSize < android.content.res.Configuration.SCREENLAYOUT_SIZE_LARGE) {
+            // Phone - lock to portrait
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+        // Tablets (LARGE or XLARGE) - allow rotation (default behavior)
 
         // Apply theme-specific window configuration
         WindowThemeManager.applyTheme(this)
@@ -116,6 +127,30 @@ class MainActivity : ComponentActivity() {
 
         // Re-apply window theme when configuration changes (e.g., dark/light mode switch)
         WindowThemeManager.applyTheme(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Tell timer service that app is in foreground
+        com.aircalc.converter.presentation.service.TimerService.setAppInForeground(true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Tell timer service that app is in background
+        com.aircalc.converter.presentation.service.TimerService.setAppInForeground(false)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // App is no longer visible - ensure notification shows
+        com.aircalc.converter.presentation.service.TimerService.setAppInForeground(false)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // App is becoming visible - minimize notification
+        com.aircalc.converter.presentation.service.TimerService.setAppInForeground(true)
     }
 }
 
@@ -183,6 +218,13 @@ fun AirFryerConverterApp(
             // Navigate when conversion completes
             LaunchedEffect(uiState.conversionResult) {
                 if (uiState.conversionResult != null && !uiState.isConverting) {
+                    // Stop any existing timer before navigating
+                    viewModel.resetTimer()
+                    delay(100) // Wait for service to stop
+
+                    // Ensure app is marked as foreground before starting timer
+                    com.aircalc.converter.presentation.service.TimerService.setAppInForeground(true)
+
                     navController.navigate("results")
                 }
             }
@@ -190,17 +232,17 @@ fun AirFryerConverterApp(
 
         composable("results") {
             uiState.conversionResult?.let { result ->
-                // Initialize timer with cooking time when screen loads
-                LaunchedEffect(result.airFryerTimeMinutes) {
-                    // Always initialize the timer when entering results screen
-                    // This sets up the timer with the correct duration but doesn't start it
-                    if (!timerState.isStarted || timerState.isFinished) {
-                        viewModel.startTimer(result.airFryerTimeMinutes)
-                        viewModel.pauseTimer()
-                    }
+                // Initialize timer when entering results screen
+                // Key on result to ensure timer resets for each new conversion
+                LaunchedEffect(result) {
+                    // Timer was already reset before navigation
+                    // Just start the new timer
+                    viewModel.startTimer(result.airFryerTimeMinutes)
+                    delay(100) // Wait for timer to initialize
+                    viewModel.pauseTimer()
                 }
 
-                // Convert ViewModel timer state to legacy UI timer state format
+                // Convert TimerService state to legacy UI timer state format
                 val legacyTimerState = remember(timerState) {
                     object : TimerState(result.airFryerTimeMinutes) {
                         override val timeLeftSeconds: Int get() = timerState.remainingSeconds
@@ -222,24 +264,28 @@ fun AirFryerConverterApp(
                     }
                 }
 
+                val resetScope = rememberCoroutineScope()
+
                 ConversionResultsScreen(
                     conversionResult = result,
                     timerState = legacyTimerState,
                     onStartTimer = {
-                        // Only start if not already started, otherwise resume
-                        if (!timerState.isStarted) {
+                        // Start or resume the timer
+                        if (timerState.remainingSeconds == 0 || timerState.isFinished) {
                             viewModel.startTimer(result.airFryerTimeMinutes)
-                        } else {
+                        } else if (!timerState.isRunning) {
                             viewModel.resumeTimer()
                         }
                     },
                     onPauseTimer = { viewModel.pauseTimer() },
                     onResumeTimer = { viewModel.resumeTimer() },
                     onResetTimer = {
-                        viewModel.resetTimer()
-                        // Re-initialize the timer with the cooking time after reset
-                        viewModel.startTimer(result.airFryerTimeMinutes)
-                        viewModel.pauseTimer()
+                        resetScope.launch {
+                            // Start fresh timer - this replaces the old one
+                            viewModel.startTimer(result.airFryerTimeMinutes)
+                            delay(50) // Wait for timer to initialize
+                            viewModel.pauseTimer()
+                        }
                     },
                     onNavigateBack = {
                         viewModel.clearResult()
@@ -386,29 +432,6 @@ fun ConversionInputScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
         }
-    }
-}
-
-@Composable
-fun BorderCard(
-    modifier: Modifier = Modifier,
-    backgroundColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surface,
-    borderColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.outline,
-    content: @Composable () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .background(
-                color = backgroundColor,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .border(
-                width = 1.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(12.dp)
-            )
-    ) {
-        content()
     }
 }
 

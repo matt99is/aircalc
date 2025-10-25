@@ -6,7 +6,6 @@ import com.aircalc.converter.data.repository.ConversionRepositoryImpl
 import com.aircalc.converter.domain.repository.ConversionRepository
 import com.aircalc.converter.domain.usecase.ConversionValidator
 import com.aircalc.converter.domain.usecase.ConvertToAirFryerUseCase
-import com.aircalc.converter.presentation.timer.TimerManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -55,10 +54,5 @@ object AppModule {
         validator: ConversionValidator
     ): ConvertToAirFryerUseCase {
         return ConvertToAirFryerUseCase(repository, validator)
-    }
-
-    @Provides
-    fun provideTimerManager(): TimerManager {
-        return TimerManager()
     }
 }

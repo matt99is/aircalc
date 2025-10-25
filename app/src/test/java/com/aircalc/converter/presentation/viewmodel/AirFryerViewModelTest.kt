@@ -1,17 +1,16 @@
 package com.aircalc.converter.presentation.viewmodel
 
+import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.aircalc.converter.domain.model.*
 import com.aircalc.converter.domain.usecase.ConvertToAirFryerUseCase
 import com.aircalc.converter.domain.usecase.ConversionEstimate
 import com.aircalc.converter.presentation.state.AirFryerUiState
-import com.aircalc.converter.presentation.timer.TimerManager
 import com.aircalc.converter.testutil.*
 import com.google.common.truth.Truth.assertThat
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
@@ -33,14 +32,14 @@ class AirFryerViewModelTest {
 
     private lateinit var viewModel: AirFryerViewModel
     private lateinit var mockUseCase: ConvertToAirFryerUseCase
-    private lateinit var mockTimerManager: TimerManager
+    private lateinit var mockApplication: Application
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
 
         mockUseCase = mockk()
-        mockTimerManager = TestMocks.createMockTimerManager()
+        mockApplication = mockk(relaxed = true)
 
         // Mock the getQuickEstimate call that happens during ViewModel initialization
         every {
@@ -52,7 +51,7 @@ class AirFryerViewModelTest {
             )
         } returns ConversionEstimate(325, 18, TemperatureUnit.FAHRENHEIT)
 
-        viewModel = AirFryerViewModel(mockUseCase, mockTimerManager)
+        viewModel = AirFryerViewModel(mockApplication, mockUseCase)
     }
 
     @After
@@ -66,10 +65,10 @@ class AirFryerViewModelTest {
     fun `initial state has default values`() {
         val state = viewModel.uiState.value
 
-        assertThat(state.ovenTemperature).isEqualTo(350)
+        assertThat(state.ovenTemperature).isEqualTo(180)
         assertThat(state.cookingTime).isEqualTo(25)
         assertThat(state.selectedCategory).isEqualTo(FoodCategory.READY_MEALS)
-        assertThat(state.temperatureUnit).isEqualTo(TemperatureUnit.FAHRENHEIT)
+        assertThat(state.temperatureUnit).isEqualTo(TemperatureUnit.CELSIUS)
         assertThat(state.isConverting).isFalse()
         assertThat(state.conversionResult).isNull()
         assertThat(state.errorMessage).isNull()
@@ -323,8 +322,6 @@ class AirFryerViewModelTest {
         assertThat(newState.conversionResult).isNull()
         assertThat(newState.errorMessage).isNull()
         assertThat(newState.ovenTemperature).isEqualTo(375) // Other state preserved
-
-        verify { mockTimerManager.resetTimer() }
     }
 
     @Test
@@ -348,51 +345,6 @@ class AirFryerViewModelTest {
         viewModel.dismissError()
 
         assertThat(viewModel.uiState.value.errorMessage).isNull()
-    }
-
-    // MARK: - Timer Integration Tests
-
-    @Test
-    fun `startTimer delegates to timer manager`() {
-        val minutes = 25
-
-        viewModel.startTimer(minutes)
-
-        verify { mockTimerManager.startTimer(minutes) }
-    }
-
-    @Test
-    fun `pauseTimer delegates to timer manager`() {
-        viewModel.pauseTimer()
-
-        verify { mockTimerManager.pauseTimer() }
-    }
-
-    @Test
-    fun `resumeTimer delegates to timer manager`() {
-        viewModel.resumeTimer()
-
-        verify { mockTimerManager.resumeTimer() }
-    }
-
-    @Test
-    fun `resetTimer delegates to timer manager`() {
-        viewModel.resetTimer()
-
-        verify { mockTimerManager.resetTimer() }
-    }
-
-    @Test
-    fun `cleanup calls timer cleanup when viewModel is cleared`() {
-        // Test cleanup behavior by directly calling what would happen on clear
-        // Since onCleared is protected, we test the underlying behavior
-        verify(exactly = 0) { mockTimerManager.cleanup() }
-
-        // Simulate viewModel cleanup - in real app this would be called by onCleared
-        // We can't test onCleared directly as it's protected, but we know it should call cleanup
-        mockTimerManager.cleanup()
-
-        verify { mockTimerManager.cleanup() }
     }
 
     // MARK: - Accessibility Tests

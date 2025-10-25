@@ -41,9 +41,9 @@
     <!-- Timer -->
     <string name="times_up">🔔 Time\'s Up!</string>
     <string name="cooking_timer">⏱️ Cooking Timer</string>
-    <string name="pause">⏸️ Pause</string>
-    <string name="resume">▶️ Resume</string>
-    <string name="reset">🔄 Reset</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="reset">Reset</string>
 
     <!-- Results Screen Strings -->
     <string name="go_back">Go back to conversion input</string>

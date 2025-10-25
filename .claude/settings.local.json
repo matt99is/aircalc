@@ -39,7 +39,11 @@
       "Read(//c/Users/mattl/Pictures/Screenshots/**)",
       "Bash(.gradlew clean bundleRelease)",
       "Bash(./gradlew.bat clean:*)",
-      "Bash(./gradlew.bat:*)"
+      "Bash(./gradlew.bat:*)",
+      "Bash(git pull:*)",
+      "Bash(adb install:*)",
+      "Bash(Select-String -Pattern \"BUILD|error|Failed|FAILURE\" -Context 2)",
+      "Bash(del \"C:\\Users\\mattl\\AirCalc\\app\\src\\main\\java\\com\\aircalc\\converter\\presentation\\timer\\TimerManager.kt\")"
     ],
     "deny": [],
     "ask": []

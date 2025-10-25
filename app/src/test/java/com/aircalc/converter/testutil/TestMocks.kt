@@ -4,10 +4,7 @@ import com.aircalc.converter.domain.model.*
 import com.aircalc.converter.domain.repository.ConversionRepository
 import com.aircalc.converter.domain.usecase.ConversionValidator
 import com.aircalc.converter.data.datasource.ConversionDataSource
-import com.aircalc.converter.presentation.timer.TimerManager
 import io.mockk.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Mock factory for creating test doubles.
@@ -100,19 +97,6 @@ object TestMocks {
     }
 
     /**
-     * Create a mock TimerManager with configurable state.
-     */
-    fun createMockTimerManager(): TimerManager = mockk {
-        val timerState = MutableStateFlow(com.aircalc.converter.presentation.timer.TimerState())
-        every { this@mockk.timerState } returns timerState as StateFlow<com.aircalc.converter.presentation.timer.TimerState>
-        every { startTimer(any()) } returns Unit
-        every { pauseTimer() } returns Unit
-        every { resumeTimer() } returns Unit
-        every { resetTimer() } returns Unit
-        every { cleanup() } returns Unit
-    }
-
-    /**
      * Creates validation errors for testing.
      */
     object ValidationErrors {
@@ -125,14 +109,3 @@ object TestMocks {
         val vegetablesTempTooLow = ValidationError.Custom("Temperature too low for vegetables - may not cook properly")
     }
 }
-
-/**
- * Timer state for testing.
- */
-data class TimerState(
-    val isRunning: Boolean = false,
-    val isPaused: Boolean = false,
-    val totalTimeMinutes: Int = 0,
-    val remainingTimeSeconds: Int = 0,
-    val isCompleted: Boolean = false
-)
