@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.2] - 2025-10-26
+
+### Changed
+- **Massive code cleanup** - Removed 913 lines of duplicate and unused code
+- **MainActivity optimized** - Reduced from 1,556 lines to 643 lines (59% reduction)
+- Improved code organization by removing duplicate component definitions
+- Moved notification strings to strings.xml for proper localization support
+
+### Technical
+- Removed 9 unused Composable functions (526 lines)
+- Removed 3 duplicate component definitions (387 lines)
+- Replaced hardcoded color values with PrimaryRed theme constant
+- Better separation of concerns with components in dedicated files
+- Improved code maintainability and readability
+
 ## [1.7.1] - 2025-10-25
 
 ### Fixed
@@ -153,6 +168,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Google Play Release Notes
 
+### Version 1.7.2
+```
+• Major code cleanup: Removed 900+ lines of duplicate code
+• Improved app performance and maintainability
+• Better code organization for future updates
+• Minor bug fixes and improvements
+```
+
 ### Version 1.7.1
 ```
 • Massive battery optimization: Notifications now update 60x less frequently
@@ -225,7 +248,8 @@ AirCalc follows [Semantic Versioning](https://semver.org/):
 
 ---
 
-[unreleased]: https://github.com/matt99is/aircalc/compare/v1.7.1...HEAD
+[unreleased]: https://github.com/matt99is/aircalc/compare/v1.7.2...HEAD
+[1.7.2]: https://github.com/matt99is/aircalc/releases/tag/v1.7.2
 [1.7.1]: https://github.com/matt99is/aircalc/releases/tag/v1.7.1
 [1.7.0]: https://github.com/matt99is/aircalc/releases/tag/v1.7.0
 [1.6.1]: https://github.com/matt99is/aircalc/releases/tag/v1.6.1

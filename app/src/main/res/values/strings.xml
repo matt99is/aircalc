@@ -45,6 +45,12 @@
     <string name="resume">Resume</string>
     <string name="reset">Reset</string>
 
+    <!-- Timer Notifications -->
+    <string name="timer_notification_channel_name">Timer Completion</string>
+    <string name="timer_notification_channel_desc">Notifications when cooking timer completes</string>
+    <string name="timer_complete_title">Timer Complete!</string>
+    <string name="timer_complete_text">Your food is ready!</string>
+
     <!-- Results Screen Strings -->
     <string name="go_back">Go back to conversion input</string>
     <string name="air_fryer_settings_title">Air fryer settings</string>

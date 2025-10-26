@@ -33,6 +33,7 @@ class AirFryerViewModelTest {
     private lateinit var viewModel: AirFryerViewModel
     private lateinit var mockUseCase: ConvertToAirFryerUseCase
     private lateinit var mockApplication: Application
+    private lateinit var mockTimerManager: com.aircalc.converter.presentation.timer.TimerManager
 
     @Before
     fun setUp() {
@@ -40,6 +41,15 @@ class AirFryerViewModelTest {
 
         mockUseCase = mockk()
         mockApplication = mockk(relaxed = true)
+        mockTimerManager = mockk(relaxed = true)
+
+        // Mock timer state flow
+        every { mockTimerManager.timerState } returns kotlinx.coroutines.flow.MutableStateFlow(
+            com.aircalc.converter.presentation.timer.TimerState()
+        )
+
+        // Mock restoreTimerState to do nothing
+        coEvery { mockTimerManager.restoreTimerState(any()) } returns Unit
 
         // Mock the getQuickEstimate call that happens during ViewModel initialization
         every {
@@ -51,7 +61,7 @@ class AirFryerViewModelTest {
             )
         } returns ConversionEstimate(325, 18, TemperatureUnit.FAHRENHEIT)
 
-        viewModel = AirFryerViewModel(mockApplication, mockUseCase)
+        viewModel = AirFryerViewModel(mockApplication, mockUseCase, mockTimerManager)
     }
 
     @After

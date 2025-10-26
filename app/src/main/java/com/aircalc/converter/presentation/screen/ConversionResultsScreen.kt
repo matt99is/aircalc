@@ -279,7 +279,7 @@ private fun CircularTimerSection(
                 // Progress arc (red)
                 if (progress > 0) {
                     drawArc(
-                        color = androidx.compose.ui.graphics.Color(0xFFA31B1B),
+                        color = PrimaryRed,
                         startAngle = -90f,
                         sweepAngle = progress * 360f,
                         useCenter = false,

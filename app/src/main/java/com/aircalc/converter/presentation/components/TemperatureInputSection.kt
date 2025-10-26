@@ -123,7 +123,8 @@ fun TemperatureInputSection(
                     fontWeight = FontWeight.Bold,
                     color = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PureBlack,
                     modifier = Modifier.clickable {
-                        // TODO: Show keyboard input dialog
+                        // FUTURE: Add dialog for direct numeric keyboard input
+                        // Would allow users to type exact temperature values
                     }
                 )
             }

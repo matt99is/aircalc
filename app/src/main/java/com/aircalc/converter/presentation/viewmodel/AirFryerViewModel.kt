@@ -7,7 +7,7 @@ import com.aircalc.converter.domain.model.*
 import com.aircalc.converter.domain.usecase.ConvertToAirFryerUseCase
 import com.aircalc.converter.domain.usecase.ConversionEstimate
 import com.aircalc.converter.presentation.state.AirFryerUiState
-import com.aircalc.converter.presentation.service.TimerService
+import com.aircalc.converter.presentation.timer.TimerManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -16,20 +16,27 @@ import javax.inject.Inject
 /**
  * ViewModel for the Air Fryer app.
  * Manages UI state and coordinates between UI and domain layer.
- * Uses TimerService for background timer functionality.
+ * Uses TimerManager for alarm-based timer functionality.
  */
 @HiltViewModel
 class AirFryerViewModel @Inject constructor(
     application: Application,
-    private val convertToAirFryerUseCase: ConvertToAirFryerUseCase
+    private val convertToAirFryerUseCase: ConvertToAirFryerUseCase,
+    private val timerManager: TimerManager
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(AirFryerUiState())
     val uiState: StateFlow<AirFryerUiState> = _uiState.asStateFlow()
 
-    // Timer state from TimerService (static)
-    // No need to collect here - state is already exposed as StateFlow
-    val timerState = TimerService.timerState
+    // Timer state exposed from timer manager
+    val timerState = timerManager.timerState
+
+    init {
+        // Restore timer state if app was killed
+        viewModelScope.launch {
+            timerManager.restoreTimerState(viewModelScope)
+        }
+    }
 
     // Derived states for UI optimization
     val canConvert: StateFlow<Boolean> = _uiState.map { state ->
@@ -199,7 +206,7 @@ class AirFryerViewModel @Inject constructor(
             conversionResult = null,
             errorMessage = null
         )
-        TimerService.stop(getApplication())
+        timerManager.resetTimer(viewModelScope)
     }
 
     /**
@@ -210,25 +217,25 @@ class AirFryerViewModel @Inject constructor(
     }
 
     /**
-     * Timer management functions using background service.
+     * Timer management functions using alarm-based timer.
      */
     fun startTimer(minutes: Int) {
-        TimerService.start(getApplication(), minutes)
+        timerManager.startTimer(viewModelScope, minutes)
         announceToAccessibility("Timer started for $minutes minutes")
     }
 
     fun pauseTimer() {
-        TimerService.pause(getApplication())
+        timerManager.pauseTimer(viewModelScope)
         announceToAccessibility("Timer paused")
     }
 
     fun resumeTimer() {
-        TimerService.resume(getApplication())
+        timerManager.resumeTimer(viewModelScope)
         announceToAccessibility("Timer resumed")
     }
 
     fun resetTimer() {
-        TimerService.stop(getApplication())
+        timerManager.resetTimer(viewModelScope)
         announceToAccessibility("Timer reset")
     }
 
@@ -258,6 +265,7 @@ class AirFryerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        // Timer is managed by service, no cleanup needed
+        // Cleanup timer manager resources
+        timerManager.cleanup()
     }
 }

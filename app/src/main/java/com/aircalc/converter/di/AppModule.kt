@@ -1,14 +1,17 @@
 package com.aircalc.converter.di
 
+import android.content.Context
 import com.aircalc.converter.data.datasource.ConversionDataSource
 import com.aircalc.converter.data.repository.ConversionCache
 import com.aircalc.converter.data.repository.ConversionRepositoryImpl
 import com.aircalc.converter.domain.repository.ConversionRepository
 import com.aircalc.converter.domain.usecase.ConversionValidator
 import com.aircalc.converter.domain.usecase.ConvertToAirFryerUseCase
+import com.aircalc.converter.presentation.timer.TimerManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -54,5 +57,13 @@ object AppModule {
         validator: ConversionValidator
     ): ConvertToAirFryerUseCase {
         return ConvertToAirFryerUseCase(repository, validator)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTimerManager(
+        @ApplicationContext context: Context
+    ): TimerManager {
+        return TimerManager(context)
     }
 }

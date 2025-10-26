@@ -72,7 +72,7 @@ data class ConversionResult(
  * Timer state interface for ConversionResultsScreen.
  * Allows using either legacy timer or ViewModel-based timer.
  */
-abstract class TimerState(initialTimeMinutes: Int = 0) {
+abstract class TimerState {
     abstract val timeLeftSeconds: Int
     abstract val isRunning: Boolean
     abstract val isFinished: Boolean
@@ -80,5 +80,5 @@ abstract class TimerState(initialTimeMinutes: Int = 0) {
 
     abstract fun startTimer()
     abstract fun pauseTimer()
-    abstract fun resetTimer(newTimeMinutes: Int)
+    abstract fun resetTimer(minutes: Int)
 }
