@@ -44,3 +44,19 @@
 
 # Keep enum classes
 -keepclassmembers enum * { *; }
+
+# Keep Application class
+-keep class com.aircalc.converter.AirCalcApplication { *; }
+
+# Keep BroadcastReceiver for timer alarms
+-keep class com.aircalc.converter.presentation.service.TimerAlarmReceiver { *; }
+
+# DataStore
+-keep class androidx.datastore.*.** { *; }
+
+# Keep Kotlin metadata for reflection
+-keepattributes *Annotation*, Signature, Exception
+
+# Keep all classes in the converter package from being removed
+-keep class com.aircalc.converter.** { *; }
+-keepclassmembers class com.aircalc.converter.** { *; }
