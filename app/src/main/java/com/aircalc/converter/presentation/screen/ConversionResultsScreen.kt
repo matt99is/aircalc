@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -183,9 +184,11 @@ private fun AirFryerSettingsCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium,
                 color = if (isDark) MaterialTheme.colorScheme.onTertiaryContainer else PureBlack,
-                modifier = Modifier.semantics {
-                    contentDescription = "Air fryer conversion results"
-                }
+                modifier = Modifier
+                    .testTag("resultsTitle")
+                    .semantics {
+                        contentDescription = "Air fryer conversion results"
+                    }
             )
 
             Spacer(modifier = Modifier.height(6.dp))

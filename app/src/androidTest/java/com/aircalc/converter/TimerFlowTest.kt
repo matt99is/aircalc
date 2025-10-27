@@ -45,7 +45,8 @@ class TimerFlowTest {
             .onNodeWithText("Convert")
             .performClick()
 
-        // Wait for navigation to results screen
+        // Wait longer for navigation - conversion may take time
+        Thread.sleep(2000)
         composeTestRule.waitForIdle()
 
         // Verify we're on the results screen by checking for timer controls

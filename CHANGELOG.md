@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.3] - 2025-10-27
+
+### Technical
+- Added HiltTestRunner for proper dependency injection in UI tests
+- Updated test infrastructure configuration
+- Added testTag support to ConversionResultsScreen for improved test reliability
+- Improved test timing and navigation handling in instrumented tests
+
 ## [1.7.2] - 2025-10-26
 
 ### Changed
@@ -168,6 +176,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Google Play Release Notes
 
+### Version 1.7.3
+```
+• Test infrastructure improvements
+• Minor bug fixes and stability improvements
+• Better testing capabilities for future updates
+```
+
 ### Version 1.7.2
 ```
 • Major code cleanup: Removed 900+ lines of duplicate code
@@ -248,7 +263,8 @@ AirCalc follows [Semantic Versioning](https://semver.org/):
 
 ---
 
-[unreleased]: https://github.com/matt99is/aircalc/compare/v1.7.2...HEAD
+[unreleased]: https://github.com/matt99is/aircalc/compare/v1.7.3...HEAD
+[1.7.3]: https://github.com/matt99is/aircalc/releases/tag/v1.7.3
 [1.7.2]: https://github.com/matt99is/aircalc/releases/tag/v1.7.2
 [1.7.1]: https://github.com/matt99is/aircalc/releases/tag/v1.7.1
 [1.7.0]: https://github.com/matt99is/aircalc/releases/tag/v1.7.0
