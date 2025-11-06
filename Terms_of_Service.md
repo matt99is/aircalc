@@ -31,7 +31,7 @@ AirCalc is a cooking time conversion calculator that provides estimated cooking 
 
 **TO THE MAXIMUM EXTENT PERMITTED BY UK LAW:**
 
-Full Bloom Software and its developers SHALL NOT BE LIABLE for any direct, indirect, incidental, special, consequential, or punitive damages, including but not limited to:
+GlassLlama and its developers SHALL NOT BE LIABLE for any direct, indirect, incidental, special, consequential, or punitive damages, including but not limited to:
 - Personal injury or illness
 - Property damage
 - Loss or damage to food
@@ -107,8 +107,8 @@ These Terms, together with our Privacy Policy, constitute the entire agreement b
 ## 16. Contact Information
 
 For questions about these Terms:
-- **Developer**: Full Bloom Software
-- **Email**: mattlelonek@gmail.com
+- **Developer**: GlassLlama
+- **Email**: matt@glassllama.co.uk
 
 ---
 
