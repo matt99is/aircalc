@@ -145,8 +145,14 @@ fun AirFryerConverterApp(
     val timerState by viewModel.timerState.collectAsState()
     val isDisclaimerAccepted by viewModel.isDisclaimerAccepted.collectAsState()
 
+    // Show loading screen while checking disclaimer status
+    if (isDisclaimerAccepted == null) {
+        Box(modifier = Modifier.fillMaxSize())
+        return
+    }
+
     // Determine start destination based on disclaimer acceptance
-    val startDestination = if (isDisclaimerAccepted) "input" else "disclaimer"
+    val startDestination = if (isDisclaimerAccepted == true) "input" else "disclaimer"
 
     NavHost(
         navController = navController,

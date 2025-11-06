@@ -46,7 +46,7 @@ fun DisclaimerScreen(
     ) {
         // Title
         Text(
-            text = "Important Notice",
+            text = "Before you start",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
@@ -61,19 +61,13 @@ fun DisclaimerScreen(
         ) {
             // Disclaimer text items
             DisclaimerTextItem(
-                text = "AirCalc provides cooking time estimates only - they are guidelines, not guarantees"
+                text = "AirCalc gives you cooking estimates - think of them as helpful guides, not exact instructions"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             DisclaimerTextItem(
-                text = "Always verify food is thoroughly cooked before eating"
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            DisclaimerTextItem(
-                text = "You are responsible for ensuring food is cooked safely"
+                text = "Always check your food is properly cooked before eating"
             )
 
             Spacer(modifier = Modifier.height(24.dp))

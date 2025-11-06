@@ -33,12 +33,13 @@ class AirFryerViewModel @Inject constructor(
     // Timer state exposed from timer manager
     val timerState = timerManager.timerState
 
-    // Disclaimer acceptance state
-    val isDisclaimerAccepted: StateFlow<Boolean> = disclaimerPreferences.isDisclaimerAccepted
+    // Disclaimer acceptance state - null means loading
+    val isDisclaimerAccepted: StateFlow<Boolean?> = disclaimerPreferences.isDisclaimerAccepted
+        .map<Boolean, Boolean?> { it }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = false
+            initialValue = null
         )
 
     init {

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2025-11-06
+
+### Added
+- **Terms of Service screen** - First-launch disclaimer that users must accept before using the app
+- Food safety guidelines displayed on first launch
+- Friendly, approachable disclaimer wording for better user experience
+- Persistent acceptance tracking using DataStore preferences
+
+### Fixed
+- Fixed disclaimer screen briefly flashing on subsequent app launches after acceptance
+- Improved app initialization to wait for preference loading before determining start screen
+
+### Technical
+- Added DisclaimerPreferences class for managing terms acceptance state
+- Added DisclaimerScreen composable with scrollable content and Terms of Service link
+- Implemented nullable Boolean state flow for proper loading state handling
+- Enhanced navigation to prevent unwanted screen transitions during initialization
+
 ## [1.7.3] - 2025-10-27
 
 ### Technical
@@ -176,6 +194,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Google Play Release Notes
 
+### Version 1.8.0
+```
+• New: Terms of Service screen on first launch
+• Food safety guidelines for peace of mind
+• Friendly, user-focused disclaimer wording
+• Fixed screen flashing issues
+• Improved app startup performance
+```
+
 ### Version 1.7.3
 ```
 • Test infrastructure improvements
@@ -263,7 +290,8 @@ AirCalc follows [Semantic Versioning](https://semver.org/):
 
 ---
 
-[unreleased]: https://github.com/matt99is/aircalc/compare/v1.7.3...HEAD
+[unreleased]: https://github.com/matt99is/aircalc/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/matt99is/aircalc/releases/tag/v1.8.0
 [1.7.3]: https://github.com/matt99is/aircalc/releases/tag/v1.7.3
 [1.7.2]: https://github.com/matt99is/aircalc/releases/tag/v1.7.2
 [1.7.1]: https://github.com/matt99is/aircalc/releases/tag/v1.7.1
