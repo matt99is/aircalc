@@ -2,6 +2,7 @@ package com.aircalc.converter.di
 
 import android.content.Context
 import com.aircalc.converter.data.datasource.ConversionDataSource
+import com.aircalc.converter.data.preferences.DisclaimerPreferences
 import com.aircalc.converter.data.repository.ConversionCache
 import com.aircalc.converter.data.repository.ConversionRepositoryImpl
 import com.aircalc.converter.domain.repository.ConversionRepository
@@ -65,5 +66,13 @@ object AppModule {
         @ApplicationContext context: Context
     ): TimerManager {
         return TimerManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDisclaimerPreferences(
+        @ApplicationContext context: Context
+    ): DisclaimerPreferences {
+        return DisclaimerPreferences(context)
     }
 }

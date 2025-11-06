@@ -3,6 +3,7 @@ package com.aircalc.converter.presentation.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.aircalc.converter.data.preferences.DisclaimerPreferences
 import com.aircalc.converter.domain.model.*
 import com.aircalc.converter.domain.usecase.ConvertToAirFryerUseCase
 import com.aircalc.converter.domain.usecase.ConversionEstimate
@@ -22,7 +23,8 @@ import javax.inject.Inject
 class AirFryerViewModel @Inject constructor(
     application: Application,
     private val convertToAirFryerUseCase: ConvertToAirFryerUseCase,
-    private val timerManager: TimerManager
+    private val timerManager: TimerManager,
+    private val disclaimerPreferences: DisclaimerPreferences
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(AirFryerUiState())
@@ -30,6 +32,14 @@ class AirFryerViewModel @Inject constructor(
 
     // Timer state exposed from timer manager
     val timerState = timerManager.timerState
+
+    // Disclaimer acceptance state
+    val isDisclaimerAccepted: StateFlow<Boolean> = disclaimerPreferences.isDisclaimerAccepted
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = false
+        )
 
     init {
         // Restore timer state if app was killed
@@ -237,6 +247,15 @@ class AirFryerViewModel @Inject constructor(
     fun resetTimer() {
         timerManager.resetTimer(viewModelScope)
         announceToAccessibility("Timer reset")
+    }
+
+    /**
+     * Accept the disclaimer and save to preferences.
+     */
+    fun acceptDisclaimer() {
+        viewModelScope.launch {
+            disclaimerPreferences.setDisclaimerAccepted()
+        }
     }
 
     /**

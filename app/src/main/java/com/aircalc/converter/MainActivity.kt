@@ -84,6 +84,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.aircalc.converter.presentation.screen.ConversionResultsScreen
+import com.aircalc.converter.presentation.screen.DisclaimerScreen
 import com.aircalc.converter.presentation.viewmodel.AirFryerViewModel
 import com.aircalc.converter.presentation.components.BorderCard
 import com.aircalc.converter.presentation.components.TemperatureInputSection
@@ -142,11 +143,28 @@ fun AirFryerConverterApp(
     val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsState()
     val timerState by viewModel.timerState.collectAsState()
+    val isDisclaimerAccepted by viewModel.isDisclaimerAccepted.collectAsState()
+
+    // Determine start destination based on disclaimer acceptance
+    val startDestination = if (isDisclaimerAccepted) "input" else "disclaimer"
 
     NavHost(
         navController = navController,
-        startDestination = "input"
+        startDestination = startDestination
     ) {
+        composable("disclaimer") {
+            DisclaimerScreen(
+                onAccept = {
+                    viewModel.acceptDisclaimer()
+                    // Navigate to input screen after acceptance
+                    navController.navigate("input") {
+                        // Remove disclaimer from back stack
+                        popUpTo("disclaimer") { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable("input") {
             // Map domain FoodCategory to UI FoodCategory for backward compatibility
             val uiFoodCategory = uiState.selectedCategory?.let { domainCat ->
